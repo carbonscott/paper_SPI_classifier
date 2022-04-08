@@ -1,0 +1,39 @@
+\documentclass[11pt]{beamer}
+\geometry{papersize={6.665in,3.75in}}    % default 128mm, 96mm
+
+% Custom style of a beamer presentation
+\usepackage{presentation}
+\setbeamertemplate{navigation symbols}{}   % Disable navigation symbols
+
+% Font
+% Use pdflatex to compile documents (default)
+\usepackage{nativefont}
+% Use xelatex to compile documents
+%% \usepackage{xefont}
+
+% Use minted to customize code highlight
+\usepackage{minted}
+\usemintedstyle{vs}
+\definecolor{codebg}{HTML}{282828}
+
+% Workaround to display bold font in math mode
+% Source: https://tex.stackexchange.com/questions/565069/beamer-bold-math-no-longer-working
+\DeclareFontShape{OT1}{cmss}{b}{n}{<->ssub * cmss/bx/n}{}
+
+\title{__title__}
+\author{__Cong Wang__}
+\institute{__SLAC National Accelerator Laboratory__}
+\date{\today}
+
+\includeonly
+{
+    sections/slide01,
+}
+
+\begin{document}
+
+    \maketitle
+
+    \include{sections/slide01}
+
+\end{document}

@@ -1,0 +1,37 @@
+% This setup is adapted from rougier's scientific-visualization-book.  
+% Refer to https://github.com/rougier/scientific-visualization-book/blob/master/tex/book.tex
+% for details
+
+% Font
+\usepackage{fontspec}
+\usepackage[babel=true]{microtype}
+%\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Source Serif Pro}[
+  Path = ./fonts/source-serif-pro/SourceSerifPro-, Extension = .otf,
+  Ligatures=TeX,
+  UprightFont= Light,
+  ItalicFont = LightIt,
+  BoldFont   = Regular,
+  BoldItalicFont = It ]
+\setsansfont{Roboto}[
+  Ligatures=TeX,
+  Path = ./fonts/roboto/Roboto-, Extension = .ttf,
+  UprightFont = Light,
+  ItalicFont = LightItalic,
+  BoldFont = Regular ]
+\setmonofont{Source Code Pro}[
+  Path = ./fonts/source-code-pro/SourceCodePro-, Extension = .otf,
+  UprightFont = Light,
+  BoldFont = Regular ]
+\newfontfamily\RobotoCon{Roboto Condensed}[
+  Path = ./fonts/roboto/RobotoCondensed-, Extension = .ttf,
+  Ligatures=TeX,
+  UprightFont = Regular,
+  ItalicFont = Italic,
+  BoldFont = Bold ]  
+\newfontfamily\Roboto{Roboto}[
+  Path = ./fonts/roboto/Roboto-, Extension = .ttf,
+  Ligatures=TeX,
+  UprightFont = Regular,
+  ItalicFont = Italic,
+  BoldFont = Black ]  

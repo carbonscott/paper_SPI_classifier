@@ -1,0 +1,57 @@
+\documentclass[preprint]{iucr}
+\journalcode{M}
+
+\usepackage{style}      % Custom style
+
+% Font
+% Use pdflatex to compile documents (default)
+%% \usepackage{nativefont}
+% Use xelatex to compile documents
+%% \usepackage{xefont}
+
+% Use minted to customize code highlight
+\usepackage{minted}
+\usemintedstyle{vs}
+\definecolor{codebg}{HTML}{282828}
+
+% Workaround to display bold font in math mode
+% Source: https://tex.stackexchange.com/questions/565069/beamer-bold-math-no-longer-working
+\DeclareFontShape{OT1}{cmss}{b}{n}{<->ssub * cmss/bx/n}{}
+
+\includeonly
+{
+    sections/inbox,
+    sections/introduction,
+    sections/background,
+    sections/model,
+    sections/experiments,
+    sections/conclusions,
+}
+
+\begin{document}
+
+    % Metadata
+    %FIXME (iris) suggested title
+    %\title{Automating Diffraction Pattern Classification in Single-Particle Imaging Experiments with a Siamese Neural Network}
+    \title{Scattering pattern classification in single-particle imaging experiments with a Siamese neural network}
+    \cauthor[a]{Forename}{Surname}{email}{address}
+    \author[a]{Forename}{Surname}
+    \aff[a]{SLAC National Accelerator Laboratory, 2575 Sand Hill Road, Menlo Park, CA 94025, USA}
+
+    \maketitle
+
+    % Contents
+    \include{sections/inbox}
+    \include{sections/introduction}
+    \include{sections/background}
+    
+    %
+    \include{sections/model}
+    \include{sections/experiments}
+    \include{sections/conclusions}
+
+    % Bibliography
+    \bibliographystyle{iucr}
+    \bibliography{bibliography}
+
+\end{document}
