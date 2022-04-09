@@ -13,7 +13,7 @@ to discriminate between differently labeled images.  We then describe the
 training strategies and model inferences.  
 
 
-\subsection{Image encoder and siamese neural networks}
+\subsection{Image encoder, siamese neural networks and triplet loss}
 
 Our image encoder consists of two convolutional layers and a fully connected
 layers.  The first convolutional layer uses a $5 \times 5$ single channel filter
@@ -22,7 +22,22 @@ with a stride of one and no padding.  The second convlutional layer employs a
 ReLU activation function is applied to the outcome of each convolutional layer,
 which is followed by a max-pooling operation performed by a $2\times 2$ filter
 with a stride of two.  Then, a fully connected layer is used to generate the
-final image embedding with the size of 128.  
+final image embedding with the size of 128.  As a result, all input images are
+encoded into embeddings in a latent space, where embedding distance between two
+images, estimated with $L^2$ squared distance, is a measurement of their
+similarities.  Namely, images of the same label should have a small embedding
+distance, whereas images of different labels should have a large embedding
+distance.  
+
+
+How to train the encoder to understand embedding similarities?  Siamese neural
+networks propose to pass a triplet of images into the same image encoder, which
+gives rise to a triplet of embeddings.  Each image/embedding triplet comprises
+an anchor as a reference, a positive with a label identical to the anchor, and a
+negative with a label different from the anchor.  The loss function in the
+training is called a triplet loss.  Concretely, an input image $x$ is embedded
+into a $d$-dimensional hypersphere with the radius of one in a latent space
+through a CNN encoder $f$, or $f(x) \in \mathbb{R}^d$ and $\|f(x)\|_2=1$.  
 
 
 %% \subsection{Image embedding, similarity measure and triplet loss}
