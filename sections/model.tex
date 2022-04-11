@@ -55,7 +55,7 @@ shown below, is thus employed to incentivize the CNN encoder $f$ to satisfy the
 training criterion in Eq. (\ref{eq:1}).
 
 \begin{equation}
-    \sum_{i=1}^{N} \left[ \|f(x_i^a) - f(x_i^p)\|_2^2 + \alpha - \|f(x_i^a) -
+    \sum_{i=1}^{N} \left[ \alpha + \|f(x_i^a) - f(x_i^p)\|_2^2 - \|f(x_i^a) -
     f(x_i^n)\|_2^2 \right]_+
 \end{equation}
 
@@ -84,5 +84,28 @@ of $\alpha$, as depicted in Eq. (\ref{eq:3}).
 
 \subsection{Optimization}
 
+%% Adam optimization algorithm
 
-\subsection{Data augmentation and preprocessing}
+We trained our CNN using Adam \cite{kingmaAdamMethodStochastic2017} with the
+learning rate of $10^{-3}$.  The CNN weights are initialized to random values
+from a Gaussian probability distribution with a mean of $0.0$ and a standard
+deviation of $0.2$.  
+
+\subsection{Data preprocessing}
+
+We use a quadrant of area, called a panel, of a pnCCD detector for training, as
+shown in the Fig. (XXX).  Thanks to the alignment of X-ray beam center with
+detector center before data collection, it's less likely for a panel to
+consistently recieve substantially more photons than other panels.  Therefore,
+we decide to vertically or horizontally flip some panels to ensure X-ray
+scattering patterns appear at the bottom right territory.  Morever, cropping the
+area that has scattering patterns also enhances model training, as our model
+doesn't have to learn from areas without salient features, e.g. areas of noise
+or systematic errors.  Then, bad pixel areas of the pnCCD detector are masked
+out with zero values before training.  Since those areas deteriorate over time,
+if not masked, they would have steered our model to learn nuanced differences
+not intrinsic in scattering patterns, eventually undermining the model accuracy.
+Lastly, to improve model accuracy, each panel is normalized by Z-score
+normalization, namely allowing the normalized values to have the mean of zero
+and the standard deviation of one.  
+
