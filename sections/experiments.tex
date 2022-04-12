@@ -29,3 +29,46 @@
 \end{itemize}
 
 }
+
+
+\subsection{Datasets}
+
+%% Why would I need those datasets?  
+%% No standard datasets.  Manual labelling.  
+%% Okay, simulated datasets are valuable in exploring the model generalizability. .
+
+% ISSUES: The amo06516 might not be correct.  
+To our knowledge, there's no existing large scale database of annotated X-ray
+single particle images.  Thankfully, we can access and manually label raw
+experimental data, specifically amo06516 \cite{liDiffractionDataAerosolized2020},
+collected in LCLS through the Coherent X-ray Imaging Data Bank (CXIDB)
+\cite{maiaCoherentXrayImaging2012}.  Meanwhile, it's challenging to
+automatically scale up annotations for experimental datasets.  We then resort to
+skopi \cite{peckSkopiSimulationPackage2021}, a GPU-based diffractive image
+simulator for noncrystalline biomolecules, for concurrently synthesizing
+high-resolution scatter patterns and accurate labels in an automated manner at
+scale.  Lastly, we aim at delivering a SPI classifer capable of real-time
+classification during data collection.  One major constraint in real-time
+scenario is that we might not have a complete view of a scattering pattern,
+assembled from pixel areas of individual detector panels.  We thus consider
+three different modes in dataset curation: (1) Image mode, where information
+from all detector panels are consolidated according to their respective physical
+locations; (2) Mosiac mode, where information from serveral detector panels are
+combined without acknowleding any geometric relations among panels;  (3) Panel
+mode, meaning that only pixel contents in a single panel during a exposure is
+visiable to our model.  
+
+%% ImageNet
+%% \cite{dengImageNetLargescaleHierarchical2009} that provides large scale
+%% annotated images, .  
+
+\subsubsection{Experimental datasets}
+
+
+\subsubsection{Simulated datasets}
+
+
+\subsubsection{Image mode, panel mode and mosaic mode}
+
+
+\subsubsection{Data augmentation}
