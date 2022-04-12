@@ -49,7 +49,7 @@ simulator for noncrystalline biomolecules, for concurrently synthesizing
 high-resolution scatter patterns and accurate labels in an automated manner at
 scale.  Lastly, we aim at delivering a SPI classifer capable of real-time
 classification during data collection.  One major constraint in real-time
-scenario is that we might not have a complete view of a scattering pattern,
+scenario is that we might not have a complete view of a scattering pattern
 assembled from pixel areas of individual detector panels.  We thus consider
 three different modes in dataset curation: (1) Image mode, where information
 from all detector panels are consolidated according to their respective physical
@@ -64,11 +64,30 @@ visiable to our model.
 
 \subsubsection{Experimental datasets}
 
+%% 0                : 83
+%% 1                : 296
+%% 2                : 177
+%% 9                : 52
+
+We chose scattering patterns from five experimental runs (90, 91, 94, 96, 102)
+in the raw dataset amo06516 and categorized them into four classes: single hit,
+multi hit, unintended hit and background.  It contains 296 single-hit examples,
+177 double-hit examples, 83 unitended-hit example and 52 background examples.
+There is a variety of variations found in the experimental dataset.  One
+prominent reason is that some examples have wrong labels. Even when images are
+all correctly labeled, it might still exhibit considerable variations induced by
+single particle orientation, X-ray beam properties, detector configuration and
+so on.  For example, a user might change detector distance from run to run, and
+the scattering pattern could appear to be larger or smaller in response to the
+change. Moreover, unexpected causes of variations, such as the presence of dead
+pixel areas, have to be addressed on an individual basis.  
+
+
 
 \subsubsection{Simulated datasets}
 
 
-\subsubsection{Image mode, panel mode and mosaic mode}
+\subsubsection{Image mode, mosaic mode and panel mode}
 
 
 \subsubsection{Data augmentation}
