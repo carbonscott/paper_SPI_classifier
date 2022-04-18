@@ -29,6 +29,38 @@ similarities.  Namely, images of the same label should have a small embedding
 distance, whereas images of different labels should have a large embedding
 distance.  
 
+%% row x col x filters
+%% \renewcommand{\arraystretch}{1.2}
+%% pnCCD: 
+\begin{table}
+\resizebox{1.0\textwidth}{!}{
+    \begin{tabular}{  | l | l l l l l | }
+        \hline
+        Layer       &  In channels    & Out channels    & Kernel size & Stride & Padding \\
+        \hline
+        Conv_1      &  1              & 32              & 5           & 1      & 0 \\
+        ReLU_1      &  -              & -               & -           & -      & - \\
+        MaxPool2D_1 &  -              & -               & 2           & 2      & 0 \\
+        Dropout_1   &  -              & -               & -           & -      & - \\
+        \hline
+        Conv_2      &  32             & 64              & 5           & 1      & 0 \\
+        ReLU_2      &  -              & -               & -           & -      & - \\
+        MaxPool2D_2 &  -              & -               & 2           & 2      & 0 \\
+        Dropout_2   &  -              & -               & -           & -      & - \\
+        \hline
+        Layer       &  In features & Out features       & - & - & - \\
+        \hline
+        FC_3        &  *              & 512             & -           & -      & - \\
+        ReLU_3      &  -              & -               & -           & -      & - \\
+        \hline
+        FC_4        &  512            & 128             & -           & -      & - \\
+        \hline
+    \end{tabular}
+}
+\caption{Our neural network architecture of the image encoder.  {\color{red}
+This whole table can be replaced by an illustrative figure.}}
+\label{table:nn_arch}
+\end{table}
 
 How to train the encoder to understand embedding similarities?  Siamese neural
 networks propose to pass a triplet of images into the same image encoder, which
