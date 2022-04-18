@@ -4,7 +4,7 @@ The goal of our model is to identify "single hit" on modular detectors in
 real-time data collection.  During training, our model takes a set of image
 triplets and their corresponding label triplets as inputs.  Each element in an
 image triplet is a quadrant of area from the high-speed pnCCD detector primarily
-used in the AMO hutch at LCLS, given that there is no time to assemble modules
+used in the AMO hutch at LCLS, given that there is no time to assemble panels
 into a whole SPI image.  We present two components in our SPI classification
 model: (1) An image encoder with a convolutional neural network (CNN)
 architecture that converts input images into embeddings in a latent vector space;
@@ -17,7 +17,7 @@ training strategies and model inferences.
 
 Our image encoder consists of two convolutional layers and a fully connected
 layers.  The first convolutional layer uses a $5 \times 5$ single channel filter
-with a stride of one and no padding.  The second convlutional layer employs a
+with a stride of one and no padding.  The second convolutional layer employs a
 32-channel $5 \times 5$ filter with a with a stride of one and no padding.  A
 ReLU activation function is applied to the outcome of each convolutional layer,
 which is followed by a max-pooling operation performed by a $2\times 2$ filter
