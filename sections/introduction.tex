@@ -29,8 +29,8 @@ objects in delivery medium and those resulting scattering patterns are labeled
 as 'unintended hit'.  Among the four categories, only 'single hit' images will
 contribute to reconstruction of electron density maps through downstream data
 processing, e.g. orientation recovery and phase retrieval.  Therefore, an
-efficient SPI scattering pattern classifier is long desired, but building one
-has remained to be an elusive task.
+efficient SPI scattering pattern classifier is long desired, and building one
+for real-time applications still remains to be an elusive task.
 
 
 % (2) The core challenges in the classification problems are this and that.
@@ -54,19 +54,19 @@ bobkovSortingAlgorithmsSingleparticle2015a} focus on extracting features from
 image samples and finding clusters of 'single hit' images.  However,
 unsupervised solutions are highly problem-specific, that is to say, it's not
 realistic to expect 'single hit' images from different biological samples would
-form clusters that overlap in the feature space.  Moreover, despite being
-unsupervised, those solutions also require prior knowledge of data distribution
-in feature space for classification, rendering it incapable of being automated.
-Supervised solutions based on neural network models learn from labelled images
-and provide predicted classification
-\cite{shiEvaluationPerformanceClassification2019,
-ignatenkoClassificationDiffractionPatterns2021}.  Convolution neural networks
-(CNN) were employed for feature extraction and a fully connected layer is
-directly attached to the convolutional layers for classification.  Training such
-networks demands a large sample size for each class, which might not be
-available during the course of data collection.  Specifically, the population of
-images vary substantially across different classes, resulting in imbalanced
-training data detrimental to model training.  
+cluster in the feature space.  Moreover, despite being unsupervised, those
+solutions also require prior knowledge of data distribution in feature space for
+classification, rendering it incapable of being automated. Supervised solutions
+based on neural network models \cite{shiEvaluationPerformanceClassification2019,
+ignatenkoClassificationDiffractionPatterns2021} have been developed to learn
+from labelled images and provide predicted classification.  In those networks,
+convolution neural networks (CNN) were employed for feature extraction and a
+fully connected layer is directly attached to the convolutional layers for
+classification.  Training such networks demands a resonably large sample size
+{\color{red}(check those papers for exact numbers)} for each class, which might
+not be available during the course of data collection. Additionally, the
+population of images vary substantially across different classes, resulting in
+imbalanced training dataset can be detrimental to model training.  
 
 
 % (3) In this work, we do this.  Concretely, our contributions are ... Siamese
@@ -75,8 +75,18 @@ training data detrimental to model training.
 % - 
 
 In this work, we strive to approach the goal of classifying scattering patterns
-in nearly real-time SPI data collection {\color{gray} with a figure to summarize
-what it is}.  
+in real-time data collection.  The primary challenge in a real-time scenario is
+that previously proposed models require manually labelled images on the fly,
+which is a unsolved classification problem itself.  It's a known bottleneck in
+classification applications, such as in facial recognition.  We thus turn the
+classification problem into a one-shot learning problem, that is to say, rather
+than trying to classify an input image, we simply compare similarity between the
+input image and a set of reference images from each class.  The class of the
+most similar reference image would imply the class of the ipnut image.
+Additionally, the model should be trainable prior to real-time data collections
+instead of having to be trained on the fly. The second challenge is the lack of
+datasets that are sophisticated enough to enable model training.  The datasets
+should have scattering patterns from different noncrystalline biomolecules.  
 
 %% We propose a Siamese network for diffraction pattern classification.  
 
