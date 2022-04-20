@@ -33,16 +33,16 @@ efficient SPI scattering pattern classifier is long desired, and building one
 for real-time applications still remains to be an elusive task.
 
 
-% (2) The core challenges in the classification problems are this and that.
+% (2) The past work on tackling the problem.  
 % ...Previous work on X has addressed with Y
 % 
 % - unsupervised method
-%   - typically problem-specific
-%   - prior knowledge about the location of deisred cluster needs to be known.  
+%   - [DONE] typically problem-specific
+%   - [DONE] prior knowledge about the location of deisred cluster needs to be known.  
 % - supervised method
-%   - some requires complete retraining.  
-%   - requires fine tune, like the layers of the network.  
-%   - still relies on hit finding for binary classifier, whereas classifier doesn't care.  
+%   - [DONE] some requires complete retraining.  
+%   - [CANCEL] requires fine tune, like the layers of the network.  
+%   - [ ] still relies on hit finding for binary classifier, whereas classifier doesn't care.  
 
 Some pioneering works that address the challenge of classifying SPI scattering
 pattern have been developed.  Unsupervised methods
@@ -69,44 +69,49 @@ population of images vary substantially across different classes, resulting in
 imbalanced training dataset can be detrimental to model training.  
 
 
-% (3) In this work, we do this.  Concretely, our contributions are ... Siamese
-% neural network.  
-% Challenges:
-% - 
+% (3) What are the core challenges?  In this work, we do this.  Concretely, our
+% contributions are ... 
 
 In this work, we strive to approach the goal of classifying scattering patterns
 in real-time data collection.  The primary challenge in a real-time scenario is
-that previously proposed models require manually labelled images on the fly,
+that previously proposed models require many manually labelled images on the fly,
 which is a unsolved classification problem itself.  It's a known bottleneck in
-classification applications, such as in facial recognition.  We thus turn the
-classification problem into a one-shot learning problem, that is to say, rather
-than trying to classify an input image, we simply compare similarity between the
-input image and a set of reference images from each class.  The class of the
-most similar reference image would imply the class of the ipnut image.
-Additionally, the model should be trainable prior to real-time data collections
-instead of having to be trained on the fly. The second challenge is the lack of
-datasets that are sophisticated enough to enable model training.  The datasets
-should have scattering patterns from different noncrystalline biomolecules.  
-
-%% We propose a Siamese network for diffraction pattern classification.  
-
-%% {
-%% \setlength{\parindent}{4em}
-%% \color{gray} 
-%% 
-%% \indent What is it concretely?  Embedding network, triplet loss function,
-%% training strategies, validation strategies, 
-%% 
-%% }
+classification applications, such as in facial recognition.  Additionally, the
+model should be trainable prior to real-time data collections instead of having
+to be trained on the fly. The second challenge is the lack of datasets that are
+sophisticated enough to enable model training. The datasets should have
+scattering patterns from different noncrystalline biomolecules.  
 
 
+% (4) What we will present to tackle the challenge?
+% Concrete contributions:
+% - Curate a sophisticated datasets that enable training a generalized model.  
+% - Train a generalized model for real-time classification.  
 
-% (4) This results in what appealing properties 
-%     and our experiments show this and that.
-% High accuracy with less training examples.  
+Our insight is to turn the classification problem into a one-shot learning
+problem, that is to say, rather than trying to classify an input image, we
+simply compare similarity between the input image and a set of reference images
+from each class.  The class of the most similar reference image would define the
+class of the input image in prediction. Concretely, our contributions can be
+summerized below:
 
-\
+\begin{itemize}
 
-Describe the unique characteristics of Siamese network and triplet loss
-function.  Our experiments show a high accuracy for diffraction pattern
-classification using this model.
+    \item We train an embedding model on a large self-curated dataset through
+    siamese networks and obtain a generalized model for real-time scattering
+    pattern classification.  We report an accuracy of {\color{red} xxx} and
+    human baseline established by {\color{red} xxx}.
+
+    \item We introduce a new large-scale synthetic SPI image database.  The
+    datasets have accurate labels and diverse scattering patterns as they are
+    provided by simulating SPI images from {\color{red} 7000+} biomolecules with
+    molecular weights larger than 380 $KDa$.  
+
+\end{itemize}
+
+
+
+
+% This results in what appealing properties and our experiments show this and
+% that. High accuracy with less training examples.  
+
