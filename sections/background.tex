@@ -21,3 +21,36 @@ introduction. Meanwhile, what works have also inspired us to propose our method?
 FaceNet paper)
 
 }
+
+\subsection{Annotations for experimental SPI images}
+
+% Non ML, many engineered steps.  
+% EM based method
+% No standard datasets
+% Our annotations include unintended hit and background
+
+Our end-to-end model is trained on manually labelled experimental images without
+any filtering or intermediate steps.  The previous machine learning model
+\cite{ignatenkoClassificationDiffractionPatterns2021} are trained on datasets
+constructed using multi-staged selections. Overall, $18,213$ images are subject
+to single-hit classification after size-based screening, and $1,085$ single hit
+images are used as ground truth after further filtering using principle
+component analysis (PCA) on cross-correlation-based engineered features
+\cite{roseSingleparticleImagingSymmetry2018}. Moreover, the dataset is improved
+by adding human-labelled SPI images, which gives rise to a total of $1,393$
+single-hit images \cite{liDiffractionDataAerosolized2020a}.  We are not aware of
+the availability of this dataset to the general public.  Therefore, a practical
+way to obtain a dataset of annotated SPI images is to curate it by ourselves.
+We use a tweaked version of psocake as a data labeler and we have constructed an
+experimental dataset with {\color{red}xxx} single-hit, {\color{red}xxx}.  
+
+
+\subsection{Generating synthetic SPI images}
+
+% No standard datasets
+% We repurpose the simulator for making synthetic datasets.
+
+\subsection{SPI image classification}
+
+
+\subsection{One-shot learning for object recognition}

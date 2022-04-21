@@ -91,16 +91,18 @@ scattering patterns from different noncrystalline biomolecules.
 Our insight is to turn the classification problem into a one-shot learning
 problem, that is to say, rather than trying to classify an input image, we
 simply compare similarity between the input image and a set of reference images
-from each class.  The class of the most similar reference image would define the
+from each class.  The class of the most similar reference image would be the
 class of the input image in prediction. Concretely, our contributions can be
 summerized below:
 
 \begin{itemize}
 
-    \item We train an embedding model on a large self-curated dataset through
-    siamese networks and obtain a generalized model for real-time scattering
-    pattern classification.  We report an accuracy of {\color{red} xxx} and
-    human baseline established by {\color{red} xxx}.
+    \item We train an end-to-end embedding model on a large self-curated dataset
+    through siamese networks and obtain a generalized model for real-time
+    scattering pattern classification.  There is no intermediate step, such as
+    hit finding or size-based filtering, required for classifying "single hit".
+    We report an accuracy of {\color{red} xxx} and human baseline established by
+    {\color{red} xxx}.  
 
     \item We introduce a new large-scale synthetic SPI image database.  The
     datasets have accurate labels and diverse scattering patterns as they are
