@@ -31,26 +31,61 @@ FaceNet paper)
 
 Our end-to-end model is trained on manually labelled experimental images without
 any filtering or intermediate steps.  The previous machine learning model
-\cite{ignatenkoClassificationDiffractionPatterns2021} are trained on datasets
-constructed using multi-staged selections. Overall, $18,213$ images are subject
+\cite{ignatenkoClassificationDiffractionPatterns2021} were trained on datasets
+constructed using multi-staged selections. Overall, $18,213$ images were subject
 to single-hit classification after size-based screening, and $1,085$ single hit
-images are used as ground truth after further filtering using principle
+images were used as ground truth after further filtering using principle
 component analysis (PCA) on cross-correlation-based engineered features
-\cite{roseSingleparticleImagingSymmetry2018}. Moreover, the dataset is improved
-by adding human-labelled SPI images, which gives rise to a total of $1,393$
+\cite{roseSingleparticleImagingSymmetry2018}. Moreover, the dataset was improved
+by adding human-labelled SPI images, which gave rise to a total of $1,393$
 single-hit images \cite{liDiffractionDataAerosolized2020a}.  We are not aware of
-the availability of this dataset to the general public.  Therefore, a practical
-way to obtain a dataset of annotated SPI images is to curate it by ourselves.
-We use a tweaked version of psocake as a data labeler and we have constructed an
-experimental dataset with {\color{red}xxx} single-hit, {\color{red}xxx}.  
+the availability of this dataset to the general public.  Therefore, we have
+decided to curate a reasonable sized datasets by ourselves. We use a tweaked
+version of psocake for data annotation and have constructed an experimental
+dataset with {\color{red}xxx} single-hit, {\color{red}xxx}.  
 
 
-\subsection{Generating synthetic SPI images}
+\subsection{Generating annotated synthetic SPI images}
 
 % No standard datasets
 % We repurpose the simulator for making synthetic datasets.
 
+Coherent X-ray Imaging Data Bank (CXIDB, \url{https://cxidb.org/})
+\cite{maiaCoherentXrayImaging2012} has been created as a public repository of
+data collected from coherent X-ray sources.  However, biological samples used in
+SPI experiments are limited to giant mimivirus (\textit{Acanthamoeba polyphaga
+mimivirus}) particles \cite{ekebergThreeDimensionalReconstructionGiant2015} and
+Coliphage PR772 virus particles \cite{reddyCoherentSoftXray2017a,
+liDiffractionDataAerosolized2020a}. Our works on an end-to-end SPI
+classification model try to expand its applicability to arbitrary biological
+particles.  We think synthetic SPI images are thus valuable in training a
+generalized classification model.  
+
+
+
 \subsection{SPI image classification}
+
+The task of SPI image classification has been explored for over a decade. Prior
+to the first CXIDB data deposition \cite{seibertSingleMimivirusParticles2011a}
+was available to the public, hit classification can be performed by evaluating a
+cross-correlation of two SPI images in polar coordinates
+\cite{bortelClassificationAveragingRandom2009}.  An alternative classification
+approach was based on expectation maximization (EM)
+\cite{dempsterMaximumLikelihoodIncomplete1977}, which is later integrated in EMC
+method \cite{lohReconstructionAlgorithmSingleparticle2009}, a widely applied
+particle reconstruction method in Cryo-EM.  Additionally, a combination of size
+filtering, feature vectors and PCA was used for achieving a better single hit
+classification \cite{bobkovSortingAlgorithmsSingleparticle2015}.  However,
+neural network models have become a new avenue for searching hit classification
+solutions with the advent of capable infrastructures (GPUs, ML frameworks) for
+model training. \cite{shiEvaluationPerformanceClassification2019} uses a neural
+network with three convolutional layers and
+\cite{ignatenkoClassificationDiffractionPatterns2021} employs off-the-shell YOLO
+models \cite{redmonYOLO9000BetterFaster2016, redmonYOLOv3IncrementalImprovement}
+.  Our approach also incorporates neural networks, but aims at training a
+generalized classification model for one-shot learning purpose.  
 
 
 \subsection{One-shot learning for object recognition}
+
+
