@@ -22,7 +22,7 @@
 %% 
 %% }
 
-\subsection{Annotations for experimental SPI images}
+\subsection{Annotating experimental SPI images}
 
 % Non ML, many engineered steps.  
 % EM based method
@@ -45,7 +45,7 @@ version of psocake for data annotation and have constructed an experimental
 dataset with {\color{red}xxx} single-hit, {\color{red}xxx}.  
 
 
-\subsection{Generating annotated synthetic SPI images}
+\subsection{Generating annotated synthetic datasets of SPI images}
 
 % No standard datasets
 % We repurpose the simulator for making synthetic datasets.
@@ -63,14 +63,14 @@ generalized classification model.
 
 
 
-\subsection{SPI image classification}
+\subsection{Classifying hits from SPI images}
 
-The task of SPI image classification has been explored for over a decade. Prior
-to the first CXIDB data deposition \cite{seibertSingleMimivirusParticles2011a}
-was available to the public, hit classification can be performed by evaluating a
-cross-correlation of two SPI images in polar coordinates
-\cite{bortelClassificationAveragingRandom2009}.  An alternative classification
-approach was based on expectation maximization (EM)
+The task of hits classification from SPI images has been explored for over a
+decade. Prior to the first CXIDB data deposition
+\cite{seibertSingleMimivirusParticles2011a} was available to the public, hit
+classification can be performed by evaluating a cross-correlation of two SPI
+images in polar coordinates \cite{bortelClassificationAveragingRandom2009}.  An
+alternative classification approach was based on expectation maximization (EM)
 \cite{dempsterMaximumLikelihoodIncomplete1977}, which is later integrated in EMC
 method \cite{lohReconstructionAlgorithmSingleparticle2009}, a widely applied
 particle reconstruction method in Cryo-EM.  Additionally, a combination of size
@@ -81,11 +81,25 @@ solutions with the advent of capable infrastructures (GPUs, ML frameworks) for
 model training. \cite{shiEvaluationPerformanceClassification2019} uses a neural
 network with three convolutional layers and
 \cite{ignatenkoClassificationDiffractionPatterns2021} employs off-the-shell YOLO
-models \cite{redmonYOLO9000BetterFaster2016, redmonYOLOv3IncrementalImprovement}
-.  Our approach also incorporates neural networks, but aims at training a
+models \cite{redmonYOLO9000BetterFaster2016, redmonYOLOv3IncrementalImprovement2018}.  
+Our approach also incorporates neural networks, but aims at training a
 generalized classification model for one-shot learning purpose.  
 
 
-\subsection{One-shot learning for object recognition}
+\subsection{Tackling one-shot learning problem}
 
-
+Many approaches have been developed for tackling one-shot learning problem in
+the object recognition domain \cite{bromleySignatureVerificationUsing1994,
+chopraLearningSimilarityMetric2005, kochSiameseNeuralNetworks2015a}.  Our
+approach is inspired by the FaceNet
+model\cite{chopraLearningSimilarityMetric2005}, which has delivered a great
+performance in facial verification problem.  Basically, the core idea is to
+train a model that can score \textit{similarity} between two input images.
+Images are considered as similar when the score is samller than a preset
+threshold, and vice versa.  The scoring function relies on a neural network
+model, trained through a triplet loss, for turning an input image into an
+embedding.  In contrast to the thresholding in FaceNet which requires an
+additional hyperparameter tuning, our model treats an input image as a query
+item, which is then subject to similarity tests against precomputed embeddings
+from each class.  We think this approach is more meaningful especially when the
+number of classes is a constant.  
