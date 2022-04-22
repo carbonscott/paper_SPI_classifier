@@ -1,4 +1,4 @@
-\section{Our method}
+\section{Methods}
 
 The goal of our model is to identify "single hit" on modular detectors in
 real-time data collection.  During training, our model takes a set of image
@@ -30,37 +30,37 @@ distance, whereas images of different labels should have a large embedding
 distance.  
 
 %% row x col x filters
-%% \renewcommand{\arraystretch}{1.2}
+\renewcommand{\arraystretch}{1.4}
 %% pnCCD: 
-\begin{table}
-\resizebox{1.0\textwidth}{!}{
-    \begin{tabular}{  | l | l l l l l | }
+\begin{center}
+\resizebox{0.48\textwidth}{!}{
+    \begin{tabular}{   l | l l l l l  }
         \hline
-        Layer       &  In channels    & Out channels    & Kernel size & Stride & Padding \\
+        Layer       &  In channels    & Out channels    & Kernel size & Stride       & Padding     \\
         \hline
-        Conv_1      &  1              & 32              & 5           & 1      & 0 \\
-        ReLU_1      &  -              & -               & -           & -      & - \\
-        MaxPool2D_1 &  -              & -               & 2           & 2      & 0 \\
-        Dropout_1   &  -              & -               & -           & -      & - \\
+        Conv 1      &  1              & 32              & 5           & 1            & 0           \\
+        ReLU 1      &  \textemdash    & \textemdash     & \textemdash & \textemdash  & \textemdash \\
+        MaxPool2D 1 &  \textemdash    & \textemdash     & 2           & 2            & 0           \\
+        Dropout 1   &  \textemdash    & \textemdash     & \textemdash & \textemdash  & \textemdash \\
         \hline
-        Conv_2      &  32             & 64              & 5           & 1      & 0 \\
-        ReLU_2      &  -              & -               & -           & -      & - \\
-        MaxPool2D_2 &  -              & -               & 2           & 2      & 0 \\
-        Dropout_2   &  -              & -               & -           & -      & - \\
+        Conv 2      &  32             & 64              & 5           & 1            & 0           \\
+        ReLU 2      &  \textemdash    & \textemdash     & \textemdash & \textemdash  & \textemdash \\
+        MaxPool2D 2 &  \textemdash    & \textemdash     & 2           & 2            & 0           \\
+        Dropout 2   &  \textemdash    & \textemdash     & \textemdash & \textemdash  & \textemdash \\
         \hline
-        Layer       &  In features & Out features       & - & - & - \\
+        Layer       &  In features    & Out features    & \textemdash & \textemdash  & \textemdash \\
         \hline
-        FC_3        &  *              & 512             & -           & -      & - \\
-        ReLU_3      &  -              & -               & -           & -      & - \\
+        FC 3        &  *              & 512             & \textemdash & \textemdash  & \textemdash \\
+        ReLU 3      &  \textemdash    & \textemdash     & \textemdash & \textemdash  & \textemdash \\
         \hline
-        FC_4        &  512            & 128             & -           & -      & - \\
+        FC 4        &  512            & 128             & \textemdash & \textemdash  & \textemdash \\
         \hline
     \end{tabular}
 }
-\caption{Our neural network architecture of the image encoder.  {\color{red}
-This whole table can be replaced by an illustrative figure.}}
-\label{table:nn_arch}
-\end{table}
+\captionof{table}{Our neural network architecture of the image encoder.
+{\color{red} This whole table can be replaced by an illustrative figure.}}
+\end{center}
+
 
 How to train the encoder to understand embedding similarities?  Siamese neural
 networks propose to pass a triplet of images into the same image encoder, which
@@ -92,7 +92,7 @@ training criterion in Eq. (\ref{eq:1}).
 \end{equation}
 
 
-\subsection{Trick in training: choose semi-hard triplets}
+\subsection{Selection of semi-hard triplets}
 
 One straightforward solution to forming a triplet can be done in two steps: (1)
 Randomly choose one class, from which drawing two examples as anchor and
@@ -110,7 +110,11 @@ than the squared distance from the positive embedding but not larger by a margin
 of $\alpha$, as depicted in Eq. (\ref{eq:3}).
 
 \begin{equation}\label{eq:3}
-    \|f(x_i^a) - f(x_i^p)\|_2^2 \;<\; \|f(x_i^a) - f(x_i^n)\|_2^2 \;<\; \|f(x_i^a) - f(x_i^p)\|_2^2 + \alpha, \, i = 1 \isep N
+    \begin{aligned}[b]
+    &\|f(x_i^a) - f(x_i^p)\|_2^2 \;<\; \|f(x_i^a) - f(x_i^n)\|_2^2 \;<\;
+    \|f(x_i^a) - f(x_i^p)\|_2^2 + \alpha, \\
+    &i = 1 \isep N
+    \end{aligned}
 \end{equation}
 
 
