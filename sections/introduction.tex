@@ -16,10 +16,10 @@ the intense X-rays.  This way of collecting scattering datasets is known as the
 'diffraction before destruction' approach
 \cite{neutzePotentialBiomolecularImaging2000,
 chapmanFemtosecondDiffractiveImaging2006,seibertSingleMimivirusParticles2011,
-aquilaLinacCoherentLight2015,reddyCoherentSoftXray2017a}.  Scattering patterns in
-SPI experiments largely fall into four categories, depending on how X-ray pulses
-hit sample particles delivered through jet streams.  Astonishingly, 98\% X-ray
-pulses miss their target particles
+aquilaLinacCoherentLight2015,reddyCoherentSoftXray2017a}.  Scattering patterns
+in SPI experiments largely fall into four categories, depending on how X-ray
+pulses hit sample particles delivered through jet streams.  Astonishingly, 98\%
+X-ray pulses miss their target particles
 \cite{shiEvaluationPerformanceClassification2019}, leading to no scattering
 pattern identified as a 'no hit'.  When X-ray photons collides with one and only
 one sample particle, the emerging scattering pattern is defined as a 'single
@@ -29,8 +29,8 @@ objects in delivery medium and those resulting scattering patterns are labeled
 as 'unintended hit'.  Among the four categories, only 'single hit' images will
 contribute to reconstruction of electron density maps through downstream data
 processing, e.g. orientation recovery and phase retrieval.  Therefore, an
-efficient SPI scattering pattern classifier is long desired, and building one
-for real-time applications still remains to be an elusive task.
+efficient SPI hit classifier is long desired, and building one that's capble of
+classifying hits during data collection has remained to be an elusive task.
 
 
 % (2) The past work on tackling the problem.  
@@ -40,9 +40,8 @@ for real-time applications still remains to be an elusive task.
 %   - [DONE] typically problem-specific
 %   - [DONE] prior knowledge about the location of deisred cluster needs to be known.  
 % - supervised method
-%   - [DONE] some requires complete retraining.  
-%   - [CANCEL] requires fine tune, like the layers of the network.  
-%   - [ ] still relies on hit finding for binary classifier, whereas classifier doesn't care.  
+%   - CNN + classifier is inefficient to train.
+%   - 
 
 Some pioneering works that address the challenge of classifying SPI scattering
 pattern have been developed.  Unsupervised methods
@@ -57,16 +56,19 @@ realistic to expect 'single hit' images from different biological samples would
 cluster in the feature space.  Moreover, despite being unsupervised, those
 solutions also require prior knowledge of data distribution in feature space for
 classification, rendering it incapable of being automated. Supervised solutions
-based on neural network models \cite{shiEvaluationPerformanceClassification2019,
-ignatenkoClassificationDiffractionPatterns2021} have been developed to learn
-from labelled images and provide predicted classification.  In those networks,
-convolution neural networks (CNN) were employed for feature extraction and a
-fully connected layer is directly attached to the convolutional layers for
-classification.  Training such networks demands a resonably large sample size
-{\color{red}(check those papers for exact numbers)} for each class, which might
-not be available during the course of data collection. Additionally, the
-population of images vary substantially across different classes, resulting in
-imbalanced training dataset can be detrimental to model training.  
+based on artificial neural network models
+\cite{shiEvaluationPerformanceClassification2019,
+ignatenkoClassificationDiffractionPatterns2021} have been employed to learn from
+labelled images and provide predicted classification.  In these neural network
+models, convolution neural networks (CNN) were applied for feature extraction
+and a fully connected layer is directly attached to the convolutional layers for
+classification.  The performance of the classifier fundamentally relies on the
+intermediate features exported by the CNN.  Training both the CNN feature
+extraction module and the classifier simultaneously demands a resonably large
+sample size for each class, e.g. $79$ single-hit images in
+\cite{shiEvaluationPerformanceClassification2019} and 165 single-hit images in
+\cite{ignatenkoClassificationDiffractionPatterns2021}, in addition to those
+required for model validation.  From a practical perspective, 
 
 
 % (3) What are the core challenges?  In this work, we do this.  Concretely, our
