@@ -1,19 +1,37 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \section{Introduction}
 
-% (1) What is SPI and what problem in SPI have I been tackling?  
-% - SPI is an important technique and where it stands in the structural biology toolkits.
-%   - Room temperature.
-%   - No need for crystalline.
-%   - One or two sentences to show why it's important.  
-% - SPI scattering patterns are like what, and classification is the problem.
+% Describe the challenge to tackle in a specific context.
+% Challenge: hit classification
+% Context  : SPI experiments
 
 Single-particle imaging (SPI) by X-ray free-electron lasers (XFELs) is a
 promising method of determining the three-dimensional structure of
-noncrystalline biomolecules at room temperature.   In SPI experiments,
+noncrystalline biomolecules at room temperature.  In SPI experiments,
 femtosecond coherent X-ray beams strike biomolecules sprayed into the beam path,
 causing scattering of radiation before destruction of the samples inflicted by
 the intense X-rays.  This way of collecting scattering datasets is known as the
-'diffraction before destruction' approach
+\textit{diffraction before destruction} approach
 \cite{neutzePotentialBiomolecularImaging2000,
 chapmanFemtosecondDiffractiveImaging2006,seibertSingleMimivirusParticles2011,
 aquilaLinacCoherentLight2015,reddyCoherentSoftXray2017a}.  Scattering patterns
@@ -21,39 +39,31 @@ in SPI experiments largely fall into four categories, depending on how X-ray
 pulses hit sample particles delivered through jet streams.  Astonishingly, 98\%
 X-ray pulses miss their target particles
 \cite{shiEvaluationPerformanceClassification2019}, leading to no scattering
-pattern identified as a 'no hit'.  When X-ray photons collides with one and only
-one sample particle, the emerging scattering pattern is defined as a 'single
-hit'. Expectedly, a 'multi hit' happens when X-ray pulses and a cluster of
-sample particles intersect. In some cases, X-ray pulses might hit non-biological
-objects in delivery medium and those resulting scattering patterns are labeled
-as 'unintended hit'.  Among the four categories, only 'single hit' images will
-contribute to reconstruction of electron density maps through downstream data
-processing, e.g. orientation recovery and phase retrieval.  Therefore, an
-efficient SPI hit classifier is long desired, and building one that's capble of
-classifying hits during data collection has remained to be an elusive task.
+pattern identified as a \textit{no-hit}.  When X-ray photons collides with one
+and only one sample particle, the emerging scattering pattern is defined as a
+\textit{single-hit}. Expectedly, a \textit{multi-hit} happens when X-ray pulses
+and a cluster of sample particles intersect. In some cases, X-ray pulses might
+hit non-biological objects in delivery medium and those resulting scattering
+patterns are labeled as \textit{non-sample-hit}.  Among the four categories,
+only \textit{single-hit} images will contribute to reconstruction of electron
+density maps through downstream data processing, e.g. orientation recovery and
+phase retrieval.  Therefore, an efficient SPI hit classifier has been long
+desired.  
 
 
-% (2) The past work on tackling the problem.  
-% ...Previous work on X has addressed with Y
-% 
-% - unsupervised method
-%   - [DONE] typically problem-specific
-%   - [DONE] prior knowledge about the location of deisred cluster needs to be known.  
-% - supervised method
-%   - CNN + classifier is inefficient to train.
-%   - 
+% Past works
 
-Some pioneering works that address the challenge of classifying SPI scattering
-pattern have been developed.  Unsupervised methods
+Some pioneering works that address the challenge of classifying SPI hits have
+been developed.  Unsupervised methods
 \cite{yoonUnsupervisedClassificationSingleparticle2011,
 giannakisSymmetriesImageFormation2012,schwanderSymmetriesImageFormation2012,
 yoonNovelAlgorithmsCoherent2012,
 andreassonAutomatedIdentificationClassification2014,
 bobkovSortingAlgorithmsSingleparticle2015} focus on extracting features from
-image samples and finding clusters of 'single hit' images.  However,
+image samples and finding clusters of \textit{single-hit} images.  However,
 unsupervised solutions are highly problem-specific, that is to say, it's not
-realistic to expect 'single hit' images from different biological samples would
-cluster in the feature space.  Moreover, despite being unsupervised, those
+realistic to expect \textit{single-hit} images from different biological samples
+would cluster in the feature space.  Moreover, despite being unsupervised, those
 solutions also require prior knowledge of data distribution in feature space for
 classification, rendering it incapable of being automated. Supervised solutions
 based on artificial neural network models
@@ -62,60 +72,82 @@ ignatenkoClassificationDiffractionPatterns2021} have been employed to learn from
 labelled images and provide predicted classification.  In these neural network
 models, convolution neural networks (CNN) were applied for feature extraction
 and a fully connected layer is directly attached to the convolutional layers for
-classification.  The performance of the classifier fundamentally relies on the
-intermediate features exported by the CNN.  Training both the CNN feature
-extraction module and the classifier simultaneously demands a resonably large
-sample size for each class, e.g. $79$ single-hit images in
-\cite{shiEvaluationPerformanceClassification2019} and 165 single-hit images in
-\cite{ignatenkoClassificationDiffractionPatterns2021}, in addition to those
-required for model validation.  From a practical perspective, 
+classification.  Training both the CNN feature extraction module and the
+classifier simultaneously demands a resonably large sample size for each class.
+For example, \cite{shiEvaluationPerformanceClassification2019} labeled 79
+\textit{single-hit} images and 121 non-\textit{single-hit} images, whereas
+\cite{ignatenkoClassificationDiffractionPatterns2021} labeled 165
+\textit{single-hit} images and 390 non-\textit{single-hit} images.  As a result,
+hit-labeling will cause a considerable delay before the nerual network models
+are trained and deployed, which still remains to be a challenge in real-time
+hit classification.  
 
 
 % (3) What are the core challenges?  In this work, we do this.  Concretely, our
 % contributions are ... 
 
-In this work, we strive to approach the goal of classifying scattering patterns
-in real-time data collection.  The primary challenge in a real-time scenario is
-that previously proposed models require many manually labelled images on the fly,
-which is a unsolved classification problem itself.  It's a known bottleneck in
-classification applications, such as in facial recognition.  Additionally, the
-model should be trainable prior to real-time data collections instead of having
-to be trained on the fly. The second challenge is the lack of datasets that are
-sophisticated enough to enable model training. The datasets should have
-scattering patterns from different noncrystalline biomolecules.  
+In this work, we strive to tackle the problem of real-time SPI hit
+classification by training an artificial neural network model that learns the
+embedding of any SPI hit image directly.  There are two possible directions to
+reach this goal: (1) Train an experiment-specific model in real time; (2) Train
+a generalized model that might work in multiple experiments with entirely
+different biological samples.  In the first scenario, the primary challenge is
+to demonstrate the applicability of embedding method when there are only small
+number of training examples available per class.  In the second scenario, we
+face a more practical challenge: there is no existing experimental dataset that
+contains a comprehensive set of biological samples.  We think the first scenario
+is more significant for it can potentially bring immediate translation into
+practices. Meanwhile, we also think there is important academic value in
+evaluating the feasibility of training a generalized embedding model for SPI hit
+classification.  
+
+Embedding method has been actively studied in the domain of machine learning,
+especially for computer vision or natural language processing applications.  One
+successful example is FaceNet \cite{schroffFaceNetUnifiedEmbedding2015} that is
+a generalized face embedding model with a deep convolutional neural network (CNN)
+trained on 100-200 million images.  FaceNet uses a contrastive learning approach
+to distinguish one class from another.  Fundementally, the model doesn't try to
+learn the notion of a \textit{single-hit}, but it learns to understand
+\textit{single-hit} is different from \textit{multi-hit} or
+\textit{non-sample-hit}.  Our insight is that it is much easier to draw contrast
+between two things than to learn the notion of them.  Therefore, we apply a
+FaceNet-like model to tackle the two challenges discussed above.  From a
+practical perspective, we want to answer: can a FaceNet-like model learn SPI hit
+embedding with a small number of training examples?  Likewise, from a
+theoretical persepective, we want to answer: can we achieve a generalized hit
+embedding model by training it on thousands of simulated SPI hit images?  
 
 
-% (4) What we will present to tackle the challenge?
-% Concrete contributions:
-% - Curate a sophisticated datasets that enable training a generalized model.  
-% - Train a generalized model for real-time classification.  
+% (4) What will we present to tackle the challenge? Concrete contributions.
 
-Our insight is to turn the classification problem into a one-shot learning
-problem, that is to say, rather than trying to classify an input image, we
-simply compare similarity between the input image and a set of reference images
-from each class.  The class of the most similar reference image would be the
-class of the input image in prediction. Concretely, our contributions can be
-summerized below:
+Concretely, our contributions are summarized below.  
 
 \begin{itemize}
 
-    \item We train an end-to-end embedding model on a large self-curated dataset
-    through siamese networks and obtain a generalized model for real-time
-    scattering pattern classification.  There is no intermediate step, such as
-    hit finding or size-based filtering, required for classifying "single hit".
-    We report an accuracy of {\color{red} xxx} and human baseline established by
-    {\color{red} xxx}.  
+    \item We introduce a neural network model that learns from a small sized
+    dataset, but still achieve a 95\% test accuracy at a precision of 92\% in
+    predicting \textit{single hit}. Specifically, the training set has 22
+    \textit{single-hit} images, 32 \textit{multi-hit} images and 26
+    \textit{non-sample-hit} images.  All examples belong to one single
+    experiment with PR772 virus as the biological specimens.  The low demand on
+    the size of training examples opens the door to real-time classification
+    tasks.  Moreover, the CNN backbone of our model, consisting of only two
+    convolutional layers, is computationally lightweight, making it more capable
+    for real-time applications.  
 
-    \item We introduce a new large-scale synthetic SPI image database.  The
-    datasets have accurate labels and diverse scattering patterns as they are
-    provided by simulating SPI images from {\color{red} 7000+} biomolecules with
-    molecular weights larger than 380 $KDa$.  
+    \item We highlight a promising result that our neural network model is
+    generalized to recognize simulated SPI hits from different biological
+    samples with a 90\% test accuracy.  We choose those biological samples that
+    have a molecular weight larger than $380 kDa$.  The reported test accuracy
+    is achieved by training our model on $50\,000$ hits sampled from 10\% of the
+    unique biological molecules in our curated simulated dataset.  The practical
+    implication of this result is currently limited due to the shortage of
+    experimental datasets.  Nonetheless, our result shows that a generalized hit
+    classification model is possible.
+
+    %% \item We introduce a new large-scale synthetic SPI image database.  The
+    %% datasets have accurate labels and diverse scattering patterns as they are
+    %% provided by simulating SPI images from {\color{red} 7000+} biomolecules with
+    %% molecular weights larger than 380 $KDa$.  
 
 \end{itemize}
-
-
-
-
-% This results in what appealing properties and our experiments show this and
-% that. High accuracy with less training examples.  
-
