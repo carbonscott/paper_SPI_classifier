@@ -47,8 +47,8 @@ hit non-biological objects in delivery medium and those resulting scattering
 patterns are labeled as \textit{non-sample-hit}.  Among the four categories,
 only \textit{single-hit} images will contribute to reconstruction of electron
 density maps through downstream data processing, e.g. orientation recovery and
-phase retrieval.  Therefore, an efficient SPI hit classifier has been long
-desired.  
+phase retrieval.  Therefore, the main goal of a SPI hit classifier is to
+identify \textit{single-hit}.  
 
 
 % Past works
@@ -70,17 +70,16 @@ based on artificial neural network models
 \cite{shiEvaluationPerformanceClassification2019,
 ignatenkoClassificationDiffractionPatterns2021} have been employed to learn from
 labelled images and provide predicted classification.  In these neural network
-models, convolution neural networks (CNN) were applied for feature extraction
+models, convolutional neural networks (CNN) were applied for feature extraction
 and a fully connected layer is directly attached to the convolutional layers for
 classification.  Training both the CNN feature extraction module and the
-classifier simultaneously demands a resonably large sample size for each class.
-For example, \cite{shiEvaluationPerformanceClassification2019} labeled 79
-\textit{single-hit} images and 121 non-\textit{single-hit} images, whereas
-\cite{ignatenkoClassificationDiffractionPatterns2021} labeled 165
-\textit{single-hit} images and 390 non-\textit{single-hit} images.  As a result,
-hit-labeling will cause a considerable delay before the nerual network models
-are trained and deployed, which still remains to be a challenge in real-time
-hit classification.  
+classifier simultaneously can be very inefficient and become a bottleneck in
+real-time classification.  Nonetheless, all previous solutions, unsupervised or
+supervised, require human in the loop for labeling before they can be applied to
+classification.  It would be great if we can train a model that can be
+generalized by learning from a large set of existing SPI hit images.
+Unfortunately, to our knowledge, there's currently no such hit classifier, whose
+generalizability has been demonstrated even on simulation data.  
 
 
 % (3) What are the core challenges?  In this work, we do this.  Concretely, our
@@ -88,18 +87,15 @@ hit classification.
 
 In this work, we strive to tackle the problem of real-time SPI hit
 classification by training an artificial neural network model that learns the
-embedding of any SPI hit image directly.  There are two possible directions to
-reach this goal: (1) Train an experiment-specific model in real time; (2) Train
-a generalized model that might work in multiple experiments with entirely
-different biological samples.  In the first scenario, the primary challenge is
-to demonstrate the applicability of embedding method when there are only small
-number of training examples available per class.  In the second scenario, we
-face a more practical challenge: there is no existing experimental dataset that
-contains a comprehensive set of biological samples.  We think the first scenario
-is more significant for it can potentially bring immediate translation into
-practices. Meanwhile, we also think there is important academic value in
-evaluating the feasibility of training a generalized embedding model for SPI hit
-classification.  
+embedding of any SPI hit image directly.  Depending on whether the solution
+requires human in the loop, there are two possible directions to approach this
+goal: (1) Use an experiment-specific model efficiently trained in real time; (2)
+Train a generalized model that identifies hits from entirely different
+biological samples. In the first scenario, the primary challenge is the design
+of a nerual network model that allows efficient training.  In the second
+scenario, we face a more practical challenge: there is no existing experimental
+or simulated dataset that contains hits from a large (hundreds or thousands)
+variety of biological samples.  
 
 Embedding method has been actively studied in the domain of machine learning,
 especially for computer vision or natural language processing applications.  One
@@ -107,33 +103,29 @@ successful example is FaceNet \cite{schroffFaceNetUnifiedEmbedding2015} that is
 a generalized face embedding model with a deep convolutional neural network (CNN)
 trained on 100-200 million images.  FaceNet uses a contrastive learning approach
 to distinguish one class from another.  Fundementally, the model doesn't try to
-learn the notion of a \textit{single-hit}, but it learns to understand
+learn the notion of a \textit{single-hit}, but it learns to understand that
 \textit{single-hit} is different from \textit{multi-hit} or
 \textit{non-sample-hit}.  Our insight is that it is much easier to draw contrast
-between two things than to learn the notion of them.  Therefore, we apply a
-FaceNet-like model to tackle the two challenges discussed above.  From a
-practical perspective, we want to answer: can a FaceNet-like model learn SPI hit
-embedding with a small number of training examples?  Likewise, from a
-theoretical persepective, we want to answer: can we achieve a generalized hit
-embedding model by training it on thousands of simulated SPI hit images?  
-
-
-% (4) What will we present to tackle the challenge? Concrete contributions.
+between two things than to learn the individual notion of each.  Similar to the
+FaceNet model, our neural network model learns hit embeddings directly by
+drawing constrasts from triplet of hits.  A triplet consists of an anchor hit, a
+positive hit that shares the same label as the anchor, and a negative hit that
+has a different label.  We train our model using the triplet loss function
+proposed in the FaceNet.  
 
 Concretely, our contributions are summarized below.  
 
 \begin{itemize}
 
-    \item We introduce a neural network model that learns from a small sized
-    dataset, but still achieve a 95\% test accuracy at a precision of 92\% in
-    predicting \textit{single hit}. Specifically, the training set has 22
-    \textit{single-hit} images, 32 \textit{multi-hit} images and 26
-    \textit{non-sample-hit} images.  All examples belong to one single
-    experiment with PR772 virus as the biological specimens.  The low demand on
-    the size of training examples opens the door to real-time classification
-    tasks.  Moreover, the CNN backbone of our model, consisting of only two
-    convolutional layers, is computationally lightweight, making it more capable
-    for real-time applications.  
+    \item We introduce a neural network model that classifies SPI
+    \textit{single-hit} with a 99\% accuracy but only takes under 15 minutes to
+    train on a NVIDIA 1080Ti.  The model learns from 80 uniquely labeled hits
+    per class and there are three classes in consideration: \textit{single-hit},
+    \textit{multi-hit} and \textit{non-sample-hit}.  However, it doesn't mean
+    that we have to label at least 80 training examples per class, and we will
+    provide a real-time data labeling strategy in this article.  Thanks to the
+    low demand on the number of training examples and short training time, our
+    model is sufficient to take on real-time hit classification tasks.  
 
     \item We highlight a promising result that our neural network model is
     generalized to recognize simulated SPI hits from different biological
@@ -142,12 +134,7 @@ Concretely, our contributions are summarized below.
     is achieved by training our model on $50\,000$ hits sampled from 10\% of the
     unique biological molecules in our curated simulated dataset.  The practical
     implication of this result is currently limited due to the shortage of
-    experimental datasets.  Nonetheless, our result shows that a generalized hit
-    classification model is possible.
-
-    %% \item We introduce a new large-scale synthetic SPI image database.  The
-    %% datasets have accurate labels and diverse scattering patterns as they are
-    %% provided by simulating SPI images from {\color{red} 7000+} biomolecules with
-    %% molecular weights larger than 380 $KDa$.  
+    experimental datasets, but our model is a step closer to realizing a
+    generalized hit classification model.
 
 \end{itemize}
