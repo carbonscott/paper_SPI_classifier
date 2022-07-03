@@ -30,10 +30,11 @@ distance, whereas images of different labels should have a large embedding
 distance.  
 
 %% row x col x filters
-\renewcommand{\arraystretch}{1.4}
+%% \renewcommand{\arraystretch}{1.4}
 %% pnCCD: 
-\begin{center}
-\resizebox{0.48\textwidth}{!}{
+\begin{table}
+\centering
+\resizebox{1.0\textwidth}{!}{
     \begin{tabular}{   l | l l l l l  }
         \hline
         Layer       &  In channels    & Out channels    & Kernel size & Stride       & Padding     \\
@@ -57,9 +58,9 @@ distance.
         \hline
     \end{tabular}
 }
-\captionof{table}{Our neural network architecture of the image encoder.
+\caption{Our neural network architecture of the image encoder.
 {\color{red} This whole table can be replaced by an illustrative figure.}}
-\end{center}
+\end{table}
 
 
 How to train the encoder to understand embedding similarities?  Siamese neural

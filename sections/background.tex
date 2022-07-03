@@ -1,68 +1,5 @@
 \section{Related work}
 
-%% Supervised solutions
-%% based on neural network models learn from labelled images and provide predicted classification
-%% (Shi et al., 2019; Ignatenko et al., 2021).
-%%
-%% SPI classification is like face recognition, which is why FaceNet idea is applied.  
-%% 
-%% Few-shot learning??? 
-%% Train our model on SPI images simulated using 40+ particles, whose MW is over 380K.  It generalizes to completely new particles of similar MW to 85% accuracy.  
-%%
-%% PDB distribution by Molecular Weight (MW)
-%% https://www.rcsb.org/stats/distribution-molecular-weight-structure
-
-%% {
-%% \setlength{\parindent}{4em}
-%% \color{gray} 
-%% 
-%% \indent Characterize related work in addressing the problem raised in the
-%% introduction. Meanwhile, what works have also inspired us to propose our method?  (The
-%% FaceNet paper)
-%% 
-%% }
-
-\subsection{Annotating experimental SPI images}
-
-% Non ML, many engineered steps.  
-% EM based method
-% No standard datasets
-% Our annotations include unintended hit and background
-
-Our end-to-end model is trained on manually labelled experimental images without
-any filtering or intermediate steps.  The previous machine learning model
-\cite{ignatenkoClassificationDiffractionPatterns2021} were trained on datasets
-constructed using multi-staged selections. Overall, $18,213$ images were subject
-to single-hit classification after size-based screening, and $1,085$ single hit
-images were used as ground truth after further filtering using principle
-component analysis (PCA) on cross-correlation-based engineered features
-\cite{roseSingleparticleImagingSymmetry2018}. Moreover, the dataset was improved
-by adding human-labelled SPI images, which gave rise to a total of $1,393$
-single-hit images \cite{liDiffractionDataAerosolized2020a}.  We are not aware of
-the availability of this dataset to the general public.  Therefore, we have
-decided to curate a reasonable sized datasets by ourselves. We use a tweaked
-version of psocake for data annotation and have constructed an experimental
-dataset with {\color{red}xxx} single-hit, {\color{red}xxx}.  
-
-
-\subsection{Generating annotated synthetic datasets of SPI images}
-
-% No standard datasets
-% We repurpose the simulator for making synthetic datasets.
-
-Coherent X-ray Imaging Data Bank (CXIDB, \url{https://cxidb.org/})
-\cite{maiaCoherentXrayImaging2012} has been created as a public repository of
-data collected from coherent X-ray sources.  However, biological samples used in
-SPI experiments are limited to giant mimivirus (\textit{Acanthamoeba polyphaga
-mimivirus}) particles \cite{ekebergThreeDimensionalReconstructionGiant2015} and
-Coliphage PR772 virus particles \cite{reddyCoherentSoftXray2017a,
-liDiffractionDataAerosolized2020a}. Our works on an end-to-end SPI
-classification model try to expand its applicability to arbitrary biological
-particles.  We think synthetic SPI images are thus valuable in training a
-generalized classification model.  
-
-
-
 \subsection{Classifying hits from SPI images}
 
 The task of hits classification from SPI images has been explored for over a
@@ -75,31 +12,51 @@ alternative classification approach was based on expectation maximization (EM)
 method \cite{lohReconstructionAlgorithmSingleparticle2009}, a widely applied
 particle reconstruction method in Cryo-EM.  Additionally, a combination of size
 filtering, feature vectors and PCA was used for achieving a better single hit
-classification \cite{bobkovSortingAlgorithmsSingleparticle2015}.  However,
-neural network models have become a new avenue for searching hit classification
-solutions with the advent of capable infrastructures (GPUs, ML frameworks) for
-model training. \cite{shiEvaluationPerformanceClassification2019} uses a neural
-network with three convolutional layers and
-\cite{ignatenkoClassificationDiffractionPatterns2021} employs off-the-shell YOLO
-models \cite{redmonYOLO9000BetterFaster2016, redmonYOLOv3IncrementalImprovement2018}.  
-Our approach also incorporates neural networks, but aims at training a
-generalized classification model for one-shot learning purpose.  
+classification \cite{bobkovSortingAlgorithmsSingleparticle2015}.  More recently,
+artificial neural network models have become a new avenue for exploring
+classification solutions with the advent of capable infrastructures (GPUs, ML
+frameworks) for model training. \cite{shiEvaluationPerformanceClassification2019}
+uses a CNN model  and \cite{ignatenkoClassificationDiffractionPatterns2021}
+employs off-the-shell YOLO models \cite{redmonYOLO9000BetterFaster2016,
+redmonYOLOv3IncrementalImprovement2018}.  Both models are trained to performance
+binary classification for identifying \textit{single-hit}.  However, they use a
+fully connected layer (FC) as the classifier that is directly attached to their
+vision modules (CNN).  This design has been known for its inefficiency to train
+as pointed out in \cite{schroffFaceNetUnifiedEmbedding2015}.  It turned out the
+YOLO model in \cite{ignatenkoClassificationDiffractionPatterns2021} takes more
+than three hours to train before it achieves an accuracy of 95\% in predicting
+single hits.  The training time is not clear in
+\cite{shiEvaluationPerformanceClassification2019}, but its accuracy is 83.8\%.
+In contrast, our model demonstrates high accuracy while keeping training time
+short.  
 
 
-\subsection{Tackling one-shot learning problem}
+\subsection{Generalizing a classifier}
 
-Many approaches have been developed for tackling one-shot learning problem in
-the object recognition domain \cite{bromleySignatureVerificationUsing1994,
-chopraLearningSimilarityMetric2005, kochSiameseNeuralNetworks2015a}.  Our
-approach is inspired by the FaceNet
-model\cite{chopraLearningSimilarityMetric2005}, which has delivered a great
-performance in facial verification problem.  Basically, the core idea is to
-train a model that can score \textit{similarity} between two input images.
-Images are considered as similar when the score is samller than a preset
-threshold, and vice versa.  The scoring function relies on a neural network
-model, trained through a triplet loss, for turning an input image into an
-embedding.  In contrast to the thresholding in FaceNet which requires an
-additional hyperparameter tuning, our model treats an input image as a query
-item, which is then subject to similarity tests against precomputed embeddings
-from each class.  We think this approach is more meaningful especially when the
-number of classes is a constant.  
+To our knowledge, there are no solution proposed to generalize a SPI hit
+classifier.  However, many approaches have been developed to generalize object
+recognition in computer vision.  One of the early example is signature
+verification using a siamese neural network
+\cite{bromleySignatureVerificationUsing1994}.  The model basically measures the
+distance between two signature embeddings generated from two identical neural
+networks, which learn to seperate embeddings of different signatures in a latent
+space and vice versa.  The idea of siamese networks are later applied in face
+recognition/verification \cite{chopraLearningSimilarityMetric2005}.  In the last
+decade, another breakthrough in face recognition is demonstrated by the use of
+triplet loss in \cite{kochSiameseNeuralNetworks2015a}, where both a positive
+example and a negative example are constrated against an anchor example. Beyound
+signature or face verification, few-shot learning problems also require
+generalizing an existing classifier to identifying new categories of things not
+seen by the model before.  For example, \cite{vinyalsMatchingNetworksOne2017}
+introduced "matching networks" that learn to query an unlabeleed example against
+one of the examples in a small support set that have new labels.
+\cite{snellPrototypicalNetworksFewshot2017} proposed a prototypical network that
+learns a metric space where classification is effecetively done by measuring
+distances between the representation of an unlabelled example and the prototype
+representation of each new class.  In our application, we choose to use triplet
+loss method to train a SPI hit classifier.  In contrast to the thresholding in
+FaceNet which requires tuning an additional hyperparameter, our model treats an
+input image as a query item, which is then subject to similarity tests against
+precomputed embeddings from each hit class.  This approach is also easy to
+implement because the number of hit classes is three as opposed to faces of
+incredibly many new identities in face verification problem.  
