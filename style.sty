@@ -1,59 +1,70 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PACKAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% set margin specifics
-\usepackage[a4paper,left=2.6cm,right=2.4cm,top=2.54cm,bottom=2.54cm]{geometry}
+%% % set margin specifics
+%% \usepackage[a4paper,left=2.6cm,right=2.4cm,top=2.54cm,bottom=2.54cm]{geometry}
 
 
-%% set unicode
+% set unicode
 \usepackage[utf8]{inputenc}
 
 
-%% set indent for paragraph
+% set indent for paragraph
 \setlength{\parindent}{2em}
 
 
-%% set graphics support
+% set graphics support
 \usepackage{graphicx}
 
 
-%% setting line spaceing
+% setting line spaceing
 \renewcommand{\baselinestretch}{1.0}
 
 
-%% use boldface in latex equation
+% use boldface in latex equation
 \usepackage{bm}
 
 
-%% Extra math feature
+% Extra math feature
 \usepackage{amssymb}
 \usepackage{amsmath}
 
 
-%% Code block
+% Code block
 \usepackage{listings}
 \lstset{basicstyle=\footnotesize\ttfamily}
 
 
-%% Color
+% Color
 \usepackage{xcolor}
 
 
 % A better enumerate tool that allows changing the label of item
+% It has compatibility issue with beamer;
 \usepackage{enumitem}
 
 
-%% Use emojis
+% Use emojis
 \usepackage{pifont}
 \usepackage{wasysym}
 
 
-%% No indent
+% No indent
 \setlength{\parindent}{0cm}
 
 
-%% Insert URL
-\usepackage{hyperref}
+%% % Insert URL
+%% \usepackage{hyperref}
 
 
-%% Caption
-\usepackage{caption}
+% Include picture environment
+\usepackage[calc]{picture}
+
+
+% Include TikZ environment
+\usepackage{tikz}
+\usepackage{calc}
+
+
+% Include caption
+%% \usepackage{caption}
+\usepackage{caption2}
 \usepackage{float}
