@@ -1,33 +1,54 @@
-\section{Methods}
-
-The goal of our model is to identify "single hit" on modular detectors in
-real-time data collection.  During training, our model takes a set of image
-triplets and their corresponding label triplets as inputs.  Each element in an
-image triplet is a quadrant of area from the high-speed pnCCD detector primarily
-used in the AMO hutch at LCLS, given that there is no time to assemble panels
-into a whole SPI image.  We present two components in our SPI classification
-model: (1) An image encoder with a convolutional neural network (CNN)
-architecture that converts input images into embeddings in a latent vector space;
-(2) Siamese neural networks that are employed for training the CNN image encoder
-to discriminate between differently labeled images.  We then describe the
-training strategies and model inferences.  
 
 
-\subsection{Image encoder, siamese neural networks and triplet loss}
 
-Our image encoder consists of two convolutional layers and a fully connected
-layers.  The first convolutional layer uses a $5 \times 5$ single channel filter
-with a stride of one and no padding.  The second convolutional layer employs a
-32-channel $5 \times 5$ filter with a with a stride of one and no padding.  A
-ReLU activation function is applied to the outcome of each convolutional layer,
-which is followed by a max-pooling operation performed by a $2\times 2$ filter
-with a stride of two.  Then, a fully connected layer is used to generate the
-final image embedding with the size of 128.  As a result, all input images are
-encoded into embeddings in a latent space, where embedding distance between two
-images, estimated with $L^2$ squared distance, is a measurement of their
-similarities.  Namely, images of the same label should have a small embedding
-distance, whereas images of different labels should have a large embedding
-distance.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Our model and training strategy for real-time hit classification}
+
+The goal of our model is to identify \textit{single-hit} while a SPI diffraction
+data collection is underway.  From a model perspective, we essentially use the
+same neural network architecture to create an experiment-specific hit classifier
+and a generalized hit classifier.  We focus more on explaining how our
+experiment-specific classifier works, considering it will have an immediate
+impact on real-time classification.  We illustrate the training strategy of a
+generalized model afterwards.  
+
+
+\subsection{CNN vision backbone}
+
+Our CNN vision backbone consists of two convolutional layers that extract image
+features and two fully connected layers that compress image features into low
+dimensional embeddings.  The first convolutional layer uses a $5 \times 5$
+single channel filter with a stride of one and no padding.  The second
+convolutional layer employs a 32-channel $5 \times 5$ filter with a with a
+stride of one and no padding.  A ReLU activation function is applied to the
+outcome of each convolutional layer, which is followed by a max-pooling
+operation performed by a $2\times 2$ filter with a stride of two.  Then, two
+fully connected layer are used to generate the final embedding with the size of
+128.  As a result, all SPI diffraction images are encoded into embeddings in a
+latent space, where embedding distance between two images, estimated with $L^2$
+squared distance, is a measurement of their similarities.  Expectedly,
+identically labelled hits should have a small embedding distance, whereas
+differently labelled hits should have a large embedding distance.  
+
+% Maybe discuss how many parameters are involved depending on the image cropping
+% and downsizing in data preprocess.  
 
 %% row x col x filters
 %% \renewcommand{\arraystretch}{1.4}
@@ -63,16 +84,40 @@ distance.
 \end{table}
 
 
-How to train the encoder to understand embedding similarities?  Siamese neural
+\subsection{Triplet loss function for training}
+
+How to train the CNN vision backbone to distinguish SPI hits?  We use a strategy
+adopted from FaceNet \cite{schroffFaceNetUnifiedEmbedding2015} that uses a
+triplet loss function for training the vision backbone.  Each input consists of
+a triplet of diffraction images, which are called an anchor $x^a$, a positive
+$x^p$ and a negative $x^n$. The anchor shares the same label as the positive but
+different from the negative.  Two pairs will be put into a comparison in the
+model. The postive pair contains the anchor and the positive $(x^a, x^p)$,
+whereas the negative pair include the anchor and the negative $(x^a, x^n)$.
+During training, three identical CNNs $f$ extract features from a triplet $(x^a,
+x^p, x^n)$, while another component in the model measures the squared $L_2$
+distance in the positive pair $\|f(x^a) - f(x^p)\|_2^2$ and the negative pair
+$\|f(x^a) - f(x^n) \|_2^2$, respectively.  The objective of training our CNN $f$
+is to separate the negative pair $(f(x^a), f(x^n))$ more than the the positive
+pair $(f(x^a), f(x^p))$ by at least a margin $\alpha$.  More specifically, we
+enforce that every embedding has a unit length of one in a $d$ dimensional
+latent space, namely $f(x) \in \mathbb{R}^d$ and $\|f(x) \|_2=1$.  It means that
+a SPI diffraction image will be mapped to a single point on a $d$-dimensional
+hypersphere with a radius of one.  
+
+A pictorial description
+of 
+
+
+Siamese neural
 networks propose to pass a triplet of images into the same image encoder, which
 gives rise to a triplet of embeddings.  Each image/embedding triplet comprises
 an anchor as a reference, a positive with a label identical to the anchor, and a
-negative with a label different from the anchor.  Concretely, an
-input image $x$ is embedded into a $d$-dimensional hypersphere with the radius
-of one in a latent space through a CNN encoder $f$, or $f(x) \in \mathbb{R}^d$
-and $\|f(x)\|_2=1$.  Given $N$ triplets of anchor $x^a$, positive $x^p$ and
-negative $x^n$, the CNN encoder $f$ should learn to meet the following training
-criterion,
+negative with a label different from the anchor.  Concretely, an input image $x$
+is embedded into a $d$-dimensional hypersphere with the radius of one in a
+latent space through a CNN encoder $f$, or $f(x) \in \mathbb{R}^d$ and $\|f(x)
+\|_2=1$.  Given $N$ triplets of anchor $x^a$, positive $x^p$ and negative $x^n$,
+the CNN encoder $f$ should learn to meet the following training criterion,
 
 \newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak}
 \begin{equation} \label{eq:1}

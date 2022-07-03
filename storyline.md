@@ -65,6 +65,7 @@ Ship a solution for real-time hit classification.
   - psana speed
   - CPU to GPU speed
     - Bigger batch might not be good.
+  - Discuss the image caching for speed.  
 
 <!--
 DARPA operates on the principle that generating big rewards requires taking big
