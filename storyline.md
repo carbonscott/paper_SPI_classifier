@@ -57,6 +57,7 @@ Ship a solution for real-time hit classification.
 - 80 images performance.
   - Show **variety** is the key and **recall** is the indicator.
   - Show augmentation enhances model training.
+  - Show semi hard selection is helpful.  
 
 - Generalizability performance
   - Show its performance on big particles.  

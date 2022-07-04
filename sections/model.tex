@@ -99,40 +99,33 @@ x^p, x^n)$, while another component in the model measures the squared $L_2$
 distance in the positive pair $\|f(x^a) - f(x^p)\|_2^2$ and the negative pair
 $\|f(x^a) - f(x^n) \|_2^2$, respectively.  The objective of training our CNN $f$
 is to separate the negative pair $(f(x^a), f(x^n))$ more than the the positive
-pair $(f(x^a), f(x^p))$ by at least a margin $\alpha$.  More specifically, we
-enforce that every embedding has a unit length of one in a $d$ dimensional
-latent space, namely $f(x) \in \mathbb{R}^d$ and $\|f(x) \|_2=1$.  It means that
-a SPI diffraction image will be mapped to a single point on a $d$-dimensional
-hypersphere with a radius of one.  
-
-A pictorial description
-of 
-
-
-Siamese neural
-networks propose to pass a triplet of images into the same image encoder, which
-gives rise to a triplet of embeddings.  Each image/embedding triplet comprises
-an anchor as a reference, a positive with a label identical to the anchor, and a
-negative with a label different from the anchor.  Concretely, an input image $x$
-is embedded into a $d$-dimensional hypersphere with the radius of one in a
-latent space through a CNN encoder $f$, or $f(x) \in \mathbb{R}^d$ and $\|f(x)
-\|_2=1$.  Given $N$ triplets of anchor $x^a$, positive $x^p$ and negative $x^n$,
-the CNN encoder $f$ should learn to meet the following training criterion,
+pair $(f(x^a), f(x^p))$ by at least a margin $\alpha$.  Suppose there are $N$
+triplets, the objective can be stated as 
 
 \newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak}
-\begin{equation} \label{eq:1}
+\begin{equation} \label{eq:objective}
     \begin{array}{l}
        \|f(x_i^a) - f(x_i^p)\|_2^2 + \alpha < \|f(x_i^a) - f(x_i^n)\|_2^2, \, i = 1 \isep N
     \end{array}
 \end{equation}
 
-where the squared embedding distance between $i$-th pair of positive and anchor
-is enforced to be shorter than the squared embedding distance between $i$-th
-pair of negative and anchor by a margin of $\alpha$.  A triplet loss function,
-shown below, is thus employed to incentivize the CNN encoder $f$ to satisfy the
-training criterion in Eq. (\ref{eq:1}).
+Meanwhile, we enforce that every embedding has a unit length of one in a
+$d$-dimensional latent space, namely $f(x) \in \mathbb{R}^d$ and $\|f(x)
+\|_2=1$. It means that a SPI diffraction image will be mapped to a single point
+on a $d$-dimensional hypersphere with a radius of one.  We can expect
+identically labelled hits will get closer over the course of training and
+eventually form a cluster.  The average distance between two clusters will
+ultimately be at least $\alpha$ in a squared $L_2$ norm sense. The largest value
+of a possible $\alpha$ is 4. Since we consider only three classes, there is
+plenty of room to fit them on a hypersphere.  As a result, the value of $\alpha$
+can take on many values.  FaceNet choose a very small $\alpha$ because they need
+to fit millions of classes onto a hypersphere and clusters have to sit close to
+one another.  
 
-\begin{equation}
+To facilite the training, the objective in Eq. (\ref{eq:objective}) is turned into the
+triplet loss function in Eq. (\ref{eq:triplet_loss}).
+
+\begin{equation} \label{eq:triplet_loss}
     \sum_{i=1}^{N} \left[ \alpha + \|f(x_i^a) - f(x_i^p)\|_2^2 - \|f(x_i^a) -
     f(x_i^n)\|_2^2 \right]_+
 \end{equation}
@@ -140,28 +133,52 @@ training criterion in Eq. (\ref{eq:1}).
 
 \subsection{Selection of semi-hard triplets}
 
-One straightforward solution to forming a triplet can be done in two steps: (1)
-Randomly choose one class, from which drawing two examples as anchor and
-positive, respectively; (2) Randomly choose one example from classes different
-from the previously chosen class.  This solution might not deliver a fast
-convergence when there are many easy triplets, namely, embeddings of the same
-class are already closer to embeddings of different classes.  One trick to
-reduce the abundance of easy triplets is to deliberately select hard triplets
-that violate the training criterion in Eq. (\ref{eq:1}).  This trick should be
-done at the mini batch level but not throughout all input images, as some badly
-imaged inputs or edge cases would appear repeatedly in triplets.  More
-specifically, we choose seimi-hard triplets during training, meaning that, given
-an anchor, the squared distance from the negative embedding should be larger
-than the squared distance from the positive embedding but not larger by a margin
-of $\alpha$, as depicted in Eq. (\ref{eq:3}).
+A triplet can be drawn completely randomly in three steps: (1) Randomly choose
+one class;  (2) Randomly sample two examples from the chosen class;  (3)
+Randomly sample one example from any class other than the chosen class.  This
+method, despite being easy to implement, might not deliver fast convergence when
+there are many easy triplets.  We consider three kinds of triplets that might
+exist during model training: easy, semi-hard and hard shown in Fig. (\ref{fig:
+semi-hard}).  In an easy triplet, the negative example is already separated by
+at at leats a margin of $\alpha$ than the positive example.  In a hard triplet,
+the negative example is actually closer to the anchor than the positive is.  In
+a semi-hard triplet, the negative example still stays more apart from the anchor
+than the positive example does, but the margin is smaller than $\alpha$.  The
+problem with easy triplets is that they contribute to zero in the triplet loss,
+and thus the training adjusts the model weights according to other triplets. The
+problem with too many hard examples is that hard examples are more likely to be
+a small fraction of samples, and minimization routine will prioritize the
+separation of those few hard examples from the anchor that can lead to bad local
+minima.  Therefore, it's a more reasonable option to select semi-hard triplets
+for training.  This strategy doesn't mean to ignore hard examples at all.
+Instead, once hard examples are pulled into the semi-hard zone, minimization can
+eventually pull them into the easy zone. This way allows majority of the
+negative examples to stay away from the anchor by a considerable margin
+$\alpha$.  From a practical standpoint, the selection of semi-hard triplets is
+done at the mini-batch level, where our model randomly selects a triplet that
+satisfies the following condition.  
 
-\begin{equation}\label{eq:3}
+\begin{equation}\label{eq: semi-hard condition}
     \begin{aligned}[b]
     &\|f(x_i^a) - f(x_i^p)\|_2^2 \;<\; \|f(x_i^a) - f(x_i^n)\|_2^2 \;<\;
     \|f(x_i^a) - f(x_i^p)\|_2^2 + \alpha, \\
     &i = 1 \isep N
     \end{aligned}
 \end{equation}
+
+\begin{figure} 
+\includegraphics[width=0.6\textwidth,keepaspectratio]
+{./figures/triplet_difficulty_level.pdf} 
+
+\caption{An example semi-hard triplet in 2D.  For illustration purposes, the
+constratin of a hypersphere is not enforced.  A positive example $x^p$ sits
+exactly on the boundary 1, which is an arc centered at $x^a$. Boundary 2 is
+$\alpha$ apart from $x^p$ and concentric to boundary 1.  Hard examples are
+located inside boundary 1.  Easy examples are located beyound boundary 2.
+Semi-hard examples are located in between boundary 1 and 2.  } 
+
+\label{fig: semi-hard} 
+\end{figure}
 
 
 \subsection{Optimization}
@@ -175,19 +192,21 @@ deviation of $0.2$.
 
 \subsection{Data preprocessing}
 
-We use a quadrant of area, called a panel, of a pnCCD detector for training, as
-shown in the Fig. (XXX).  Thanks to the alignment of X-ray beam center with
-detector center before data collection, it's less likely for a panel to
-consistently recieve substantially more photons than other panels.  Therefore,
-we decide to vertically or horizontally flip some panels to ensure X-ray
-scattering patterns appear at the bottom right territory.  Morever, cropping the
-area that has scattering patterns also enhances model training, as our model
-doesn't have to learn from areas with little salient features, e.g. areas of
-noise or systematic errors.  Then, bad pixel areas of the pnCCD detector are
-masked out with zero values before training.  Since those areas deteriorate over
-time, if not masked, they would have steered our model to learn nuanced
-differences not intrinsic in scattering patterns, eventually undermining the
-model accuracy. Lastly, to improve model accuracy, each panel is normalized by
-Z-score normalization, namely allowing the normalized values to have the mean of
-zero and the standard deviation of one.  
-
+The reasons of employing data preprocessing are two-fold in our application:
+highlight features, upscale datasets and reduce image size.  Firstly, a typical
+way to highlight image features is to zoom in on the region of interest (ROI) if
+available.  In SPI diffraction images, features are predominantly located near
+the X-ray beam center and areas remote to the center have much weaker signals.
+Based on this observation, we decide to do image cropping by only keeping the
+pixels in a user-specified ROI.  Secondly, a diffraction image collected in a
+SPI experiment won't change its nature after an in-plane rotation with the beam
+path as the rotational axis.  This characteristic allows us to upscale our
+dataset by applying random in-plane rotation, which ultimately teaches our model
+that a particular form of diffraction image can re-appear in an experiment
+except it differs by some rotation.  It's worth noting that any hit class, e.g.
+\textit{single-hit}, can have various forms but random rotation cannot alter any
+unique form of a class to resemble another one.  Lastly, we downsample
+diffraction images in our dataset by a factor of 6.  We don't have an evidence
+to conclude that the factor of 6 gives the best trade-off between size reduction
+and feature quality.  Instead, we found this value in practice that it gives
+good performance in our application.  
