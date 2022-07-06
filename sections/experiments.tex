@@ -2,70 +2,105 @@
 
 \subsection{Datasets}
 
-To our knowledge, there's no existing large scale database of annotated X-ray
-single particle images.  Thankfully, we can access and manually label raw
-experimental data, specifically amo06516 \cite{liDiffractionDataAerosolized2020},
-collected in LCLS through the Coherent X-ray Imaging Data Bank (CXIDB)
-\cite{maiaCoherentXrayImaging2012}.  Meanwhile, it's challenging to
-automatically scale up annotations for experimental datasets.  We then resort to
-skopi \cite{peckSkopiSimulationPackage2021}, a GPU-based program for simulating
-diffractive images from noncrystalline biomolecules, for concurrently
-synthesizing high-resolution scatter patterns and accurate labels in an
-automated manner at scale.  Lastly, we introduce three training modes that
-accomodate the need in real-time classification during data collection.  
-
-%% ImageNet
-%% \cite{dengImageNetLargescaleHierarchical2009} that provides large scale
-%% annotated images, .  
-
 \subsubsection{Experimental datasets}
 
-%% 0                : 83
-%% 1                : 296
-%% 2                : 177
-%% 9                : 52
+To our knowledge, there's no existing large scale database of annotated X-ray
+single particle images categorized by biological/chemical samples.  The Coherent
+X-ray Data Bank (CXIDB) serves as ``a permanent public repository of data from
+coherent X-ray sources" \cite{maiaCoherentXrayImaging2012}.  Table \ref{tb: SPI
+experiments} is a list of all SPI experiments documented on CXIDB.  We decide to
+use the raw data collected in experiment amo06516
+\cite{liDiffractionDataAerosolized2020}, part of which are also available by
+checking out CXIDB ID 156.  One major difference between raw data and deposited
+data is that raw data contain a considerable amount of \textit{non-sample-hit}
+images, which are important for real-time SPI classification tasks.  For data
+labelling, we created a GUI tool (\url{https:
+//github.com/carbonscott/hit-labeler}) that can label hits from multiple sources,
+including raw data through \textit{psana} \cite{damianiLinacCoherentLight2016}
+and HDF5 files from CXIDB.  In total, we labelled {\color{red}xxx}
+\textit{single-hit}, xxx \textit{multi-hit} and xxx \textit{non-sample-hit}.  
 
-We chose scattering patterns from five experimental runs (90, 91, 94, 96, 102)
-in the raw dataset amo06516 and categorized them into four classes: single hit,
-multi hit, unintended hit and background.  It contains 296 single-hit examples,
-177 double-hit examples, 83 unitended-hit example and 52 background examples.
-There is a variety of variations found in the experimental dataset.  One
-prominent reason is that some examples have wrong labels. Even when images are
-all correctly labeled, it might still exhibit considerable variations induced by
-single particle orientation, X-ray beam properties, detector configuration and
-so on.  For example, a user might change detector distance from run to run, and
-the scattering pattern could appear to be larger or smaller in response to the
-change. Moreover, unexpected causes of variations, such as the presence of dead
-pixel areas, have to be addressed on an individual basis.  
+\begin{table}
+\centering
+%% \renewcommand{\arraystretch}{1.2}
+\resizebox{1.0\textwidth}{!}{
+    \begin{tabular}{  | l l l | }
+        \hline
+        CXIDB ID & Light Source & Sample \\
+        \hline
+        001      & LCLS         & Mimivirus                                                       \\
+        002      & LCLS         & Mimivirus                                                       \\
+        003      & FLASH        & FIB etched 20-nm-thick silicon nitride membrane                 \\
+        004      & ALS          & Gold labeled frozen dried Saccharomyces cerevisiae yeast cells. \\
+        005      & ALS          & Gold labeled frozen dried Saccharomyces cerevisiae yeast cells. \\
+        006      & ALS          & Gold labeled frozen dried Saccharomyces cerevisiae yeast cells. \\
+        007      & ALS          & Gold labeled frozen dried Saccharomyces cerevisiae yeast cells. \\
+        008      & ALS          & Gold labeled frozen dried Saccharomyces cerevisiae yeast cells. \\
+        009      & FLASH        & Iron Oxide Ellipsoids                                           \\
+        010      & LCLS         & Nanorice                                                        \\
+        011      & LCLS         & Magnetosomes                                                    \\
+        012      & LCLS         & Tobacco mosaic virus                                            \\
+        013      & LCLS         & T4 bacteriophage                                                \\
+        014      & LCLS         & Paramecium bursaria Chlorella virus                             \\
+        019      & LCLS         & Airborne Particulate Matter (Soot)                              \\
+        020      & LCLS         & Clusters of Polystyrene Spheres                                 \\
+        025      & LCLS         & Carboxysomes                                                    \\
+        026      & LCLS         & Cyanobium gracile                                               \\
+        027      & LCLS         & Synechococcus elongatus                                         \\
+        028      & ALS          & 50 nm colloidal gold particles                                  \\
+        030      & LCLS         & Mimivirus                                                       \\
+        036      & LCLS         & Rice Dwarf Virus                                                \\
+        037      & LCLS         & Cyanobium gracile and Synechococcus elongtatus                  \\
+        056      & LCLS         & Omono River Virus                                               \\
+        057      & LCLS         & Gold core and palladium shell nanoparticles                     \\
+        058      & LCLS         & Coliphage PR772                                                 \\
+        078      & LCLS         & RNA polymerase II                                               \\
+        084      & ESRF         & Gold structure (largest diameter about 1.1 um)                  \\
+        088      & LCLS         & PR772                                                           \\
+        119      & LCLS         & Sucrose                                                         \\
+        146      & FLASH        & Xenon nanoclusters                                              \\
+        155      & LCLS         & Melbournevirus                                                  \\
+        156      & LCLS         & Coliphage PR772                                                 \\
+        \hline
+    \end{tabular}
+}
+\caption{All SPI experiments documented on CXIDB.}
+\label{tb: SPI experiments}
+\end{table}
 
 
+\subsubsection{Simulated datasets}
 
-\subsubsection{Synthetic datasets}
+Similarly, there's no existing large scale database of annotated SPI images
+generated by physics-based simulation.  To investigate generalizability of our
+SPI classifier, it's essential to have a large dataset of simulated SPI images.
+We resort to \textit{skopi} \cite{peckSkopiSimulationPackage2021}, a GPU-based
+program for simulating diffractive images from noncrystalline biomolecules, for
+concurrently simulating high-resolution SPI scattering and providing accurate
+labels in an automated manner at scale.  
 
-Given any PDB file, we use skopi \cite{peckSkopiSimulationPackage2021} to
-generate annotated SPI images by physically simulating scattered X-rays at a
-user-specified conditions like detector distance, photon energy and so on.  We
-choose to capture those simulated diffraction patterns using an artificial
-simple squared detector since an artificial pnCCD detector takes up much more
-storage space.  Our interest is to explore the model generalizability on
-\textit{large} single particles, considering the state-of-art resolution ever
-reached in an SPI experiment is still at the nanometer level ($>$ 10 $nm$)
-{\color{red} (need to fact-check)} unlike in protein crystallography that
-studies biological structures at the angstrom level. PDB statistics offers
-direct insights on PDB data distribution by molecular weight (\url{https:
-//www.rcsb.org/stats/distribution-molecular-weight-structure}).  The
-example specimen, PR772 virus particles (PDB: 6Q5U),  in SPI studies, indicating that
-particles with molecular weights over 380 $KDa$ can be considered as the
-\textit{largest} particles.  {\color{red}(Explain on how datasets are used, more
-experiments are undergoing!)} Synthetic datasets are generated by setting the
-detector distance at 100.0 $mm$ and photon energy at 1.660 $keV$.  
+Our primary interest is to explore the model generalizability on \textit{large}
+single particles, considering the state-of-art resolution ever reached in an SPI
+experiment is still at the nanometer level ($>$ 10 $nm$) {\color{red} (need to
+fact-check)} unlike in protein crystallography that studies biological
+structures at the angstrom level.  PDB statistics offers direct insights into
+PDB data distribution by molecular weight (\url{https:
+//www.rcsb.org/stats/distribution-molecular-weight-structure}).  We focus on
+\textit{large} particles with molecular weights over 380 $KDa$.  Fig. \ref{fig:
+num atom per bio assem} describes the population frequency of the atom numbers
+per biological assembly with each area representing 50 PDB items.  The atom
+numbers spread across three orders of magnitudes ($10^4\text{-}10^6$).  96.0\%
+of \textit{large} particles have $10^4$ atoms, and only 1.2\% have massive
+$10^6$ atom numbers. Simulated datasets are generated by setting the detector
+distance at 100.0 $mm$ and photon energy at 1.660 $keV$.  
 
 % Insert the figure HERE and TOP..
 \begin{figure}
-\centering
-\includegraphics[width=1.0\textwidth,keepaspectratio]{example-image}
-\caption{PDB data distribution}
-\label{fig:pdb_data_distribution}
+\includegraphics[width=1.0\textwidth,keepaspectratio]
+{./figures/num_atom_per_bio_assem.pdf}
+\caption{Number of atom per biological assembly. {\color{red} Need to indicate where
+those molecular graphs are from.}}
+\label{fig: num atom per bio assem}
 \end{figure}
 
 

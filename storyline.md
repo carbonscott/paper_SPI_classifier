@@ -44,6 +44,8 @@ Ship a solution for real-time hit classification.
 
 - [G] Estimate the speed of how many images can be processed (in Hz).
   - [G] Psana1 performance (raw is 400 Hz, calib is 9 Hz, image is 8 Hz).
+  - Data loading speed.  
+  - Data processing speed (CPU to GPU, Number crunching, etc).  
 - [O] We provide a human baseline.  
 
 ### Implications
@@ -56,8 +58,14 @@ Ship a solution for real-time hit classification.
 
 - 80 images performance.
   - Show **variety** is the key and **recall** is the indicator.
+    - Show the frac_train is key.  :>  Augmentation doesn't add to the variety.  
   - Show augmentation enhances model training.
+    - Show the behavior of the model training with/without
+      augmentation.
   - Show semi hard selection is helpful.  
+    - The loss curve (semi-hard vs random)
+    - semi-hard causes extra running time.
+    - random takes extra time to train.
 
 - Generalizability performance
   - Show its performance on big particles.  
