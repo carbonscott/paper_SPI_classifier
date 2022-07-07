@@ -54,10 +54,10 @@ differently labelled hits should have a large embedding distance.
 %% \renewcommand{\arraystretch}{1.4}
 %% pnCCD: 
 \begin{table}
-\centering
-\resizebox{1.0\textwidth}{!}{
-    \begin{tabular}{   l | l l l l l  }
-        \hline
+\caption{Our neural network architecture of the image encoder.
+{\color{red} This whole table can be replaced by an illustrative figure.}}
+%% \resizebox{1.0\textwidth}{!}{
+    \begin{tabularx}{\textwidth}{   l | l l l X X  }
         Layer       &  In channels    & Out channels    & Kernel size & Stride       & Padding     \\
         \hline
         Conv 1      &  1              & 32              & 5           & 1            & 0           \\
@@ -76,11 +76,8 @@ differently labelled hits should have a large embedding distance.
         ReLU 3      &  \textemdash    & \textemdash     & \textemdash & \textemdash  & \textemdash \\
         \hline
         FC 4        &  512            & 128             & \textemdash & \textemdash  & \textemdash \\
-        \hline
-    \end{tabular}
-}
-\caption{Our neural network architecture of the image encoder.
-{\color{red} This whole table can be replaced by an illustrative figure.}}
+    \end{tabularx}
+%% }
 \end{table}
 
 
@@ -167,7 +164,7 @@ satisfies the following condition.
 \end{equation}
 
 \begin{figure} 
-\includegraphics[width=0.6\textwidth,keepaspectratio]
+\includegraphics[width=1.0\textwidth,keepaspectratio]
 {./figures/triplet_difficulty_level.pdf} 
 
 \caption{An example semi-hard triplet in 2D.  For illustration purposes, the
