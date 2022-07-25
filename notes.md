@@ -75,8 +75,9 @@ cxidb,exp                                      ,light source,sample             
 
 ## More resources
 
-- amo86615
-  - https://cxidb.org/id-156.html
-- amox34117
-  - https://cxidb.org/id-58.html
+- https://cxidb.org/id-156.html
+  - amo86615
+  - amox34117
+
+- https://cxidb.org/id-58.html
   - https://www.nature.com/articles/sdata201779/tables/2

@@ -36,7 +36,7 @@ Ship a solution for real-time hit classification.
 - [G] Estimate how good are our training examples.  
   [G] (Variety of hit matters).
   - [G] Recall is a good indicator for real-time labeling.
-    [G] imagine all 40 hits look similar, it won't work. Recall of multi-hit will tell it.
+    [G] Imagine all 40 hits look similar, it won't work.  Recall of multi-hit will tell it.
 - [O] Data augmentation enables training on small number of uniquely labeled images.
   - [O] Saving manual labeling effort.
 
@@ -59,16 +59,38 @@ Ship a solution for real-time hit classification.
 - 80 images performance.
   - Show **variety** is the key and **recall** is the indicator.
     - Show the frac_train is key.  :>  Augmentation doesn't add to the variety.  
-  - Show augmentation enhances model training.
-    - Show the behavior of the model training with/without
-      augmentation.
-  - Show semi hard selection is helpful.  
-    - The loss curve (semi-hard vs random)
-    - semi-hard causes extra running time.
-    - random takes extra time to train.
 
 - Generalizability performance
-  - Show its performance on big particles.  
+  - What's the message I want to convey in this section?
+    - Despite the variability in PDBs, there could be a 'one-model-fits-all'
+      scenario.  
+    - Explain the data distribution (variability).
+    - What's our model?  How it performs?
+      - Any bias in the result?
+        - no, PDB
+        - no, size (atom num)
+        - no, resize?  resolution
+        - hit type
+          - what's the original hit ratio?
+            - 40, 30, 20, 10
+          - at least no direct evidence.
+            - single vs multi ratio (true): 0.99
+            - single vs multi ratio (false): 1.12
+    - Implications (with noise).  
+
+  - %pdb is higher => model training is harder
+                   => model testing is easier
+                   => training takes longer to complete
+  - Why it seems like 91% accuracy is the ceiling?
+    - No, low resolution caused by binning? 
+    - How about when training examples are more limited?
+  - model capacity is limited???
+    - [x] yes, margin or alpha
+      - Speculate why it might help training.
+      - It might take longer to train.
+    - no, model capacity (dim = 128 to 256)
+    - no, cnn kernel size
+      - make it smaller to see if it understand more details.
 
 - Estimate the Hz
   - psana speed
