@@ -42,7 +42,7 @@ outcome of each convolutional layer, which is followed by a max-pooling
 operation performed by a $2\times 2$ filter with a stride of two.  Then, two
 fully connected layer are used to generate the final embedding with the size of
 128.  As a result, all SPI diffraction images are encoded into embeddings in a
-latent space, where embedding distance between two images, estimated with $L^2$
+latent space, where embedding distance between two images, estimated with $L2$
 squared distance, is a measurement of their similarities.  Expectedly,
 identically labelled hits should have a small embedding distance, whereas
 differently labelled hits should have a large embedding distance.  
@@ -54,10 +54,10 @@ differently labelled hits should have a large embedding distance.
 %% \renewcommand{\arraystretch}{1.4}
 %% pnCCD: 
 \begin{table}
-\caption{Our neural network architecture of the image encoder.
+\caption{The architecture of the CNN vision backbone.
 {\color{red} This whole table can be replaced by an illustrative figure.}}
 %% \resizebox{1.0\textwidth}{!}{
-    \begin{tabularx}{\textwidth}{   l | l l l X X  }
+    \begin{tabularx}{\textwidth}{   l | l l X X X  }
         Layer       &  In channels    & Out channels    & Kernel size & Stride       & Padding     \\
         \hline
         Conv 1      &  1              & 32              & 5           & 1            & 0           \\
@@ -69,6 +69,7 @@ differently labelled hits should have a large embedding distance.
         ReLU 2      &  \textemdash    & \textemdash     & \textemdash & \textemdash  & \textemdash \\
         MaxPool2D 2 &  \textemdash    & \textemdash     & 2           & 2            & 0           \\
         Dropout 2   &  \textemdash    & \textemdash     & \textemdash & \textemdash  & \textemdash \\
+        \hline
         \hline
         Layer       &  In features    & Out features    & \textemdash & \textemdash  & \textemdash \\
         \hline
@@ -165,14 +166,28 @@ satisfies the following condition.
 
 \begin{figure} 
 \includegraphics[width=1.0\textwidth,keepaspectratio]
-{./figures/triplet_difficulty_level.pdf} 
+{./figures/triplet.semihard.pdf} 
+\caption{
 
-\caption{An example semi-hard triplet in 2D.  A positive example $x^p$ sits
-exactly on the boundary 1, which is an arc centered at $x^a$. Boundary 2 is
-$\alpha$ apart from $x^p$ and concentric to boundary 1.  Hard examples are
-located inside boundary 1.  Easy examples are located beyound boundary 2.
-Semi-hard examples are located in between boundary 1 and 2.  } 
+    An illustration of three types of negative examples.  $x^a$ represents an
+    anchor example and $x^p$ is a positive example.  Two arcs in dashed lines,
+    both centered at $x^a$, are used to divide the 2D plane into three areas.
+    The inner arc has a radius of $\|f(x_i^a) - f(x_i^p)\|_2^2$, whereas the
+    outer arc has a radius that is larger by a margin of $\alpha$.  Negative
+    examples will possess three difficult levels in model training based on the
+    area where they are situated.  It's considered as a hard negative example if
+    it's located within the inner arc, where $\|f(x_i^a) - f(x_i^n)\|_2^2 <
+    \|f(x_i^a) - f(x_i^p) \|_2^2$.  On the contrary, it's considered as an easy
+    negative example when it's goes outside the outer arc, where $\|f(x_i^a) -
+    f(x_i^n)\|_2^2 - \|f(x_i^a) - f(x_i^p) \|_2^2 > \alpha$.  Lastly, it becomes
+    a semi-hard negative example when it resides in the area bound between two
+    arcs.  Moreover, the loss functions results in $\mathcal{L} = \alpha$ and
+    $\mathcal{L} = 0$ when $x^n_{\text{semi-hard}}$ is on the inner arc and
+    outer arc, respectively.  Our model training will pull
+    $x^n_{\text{semi-hard}}$ close to the outer arc as much as possible, namely
+    minimizing the loss.
 
+}
 \label{fig: semi-hard} 
 \end{figure}
 
@@ -206,3 +221,42 @@ diffraction images in our dataset by a factor of 6.  We don't have an evidence
 to conclude that the factor of 6 gives the best trade-off between size reduction
 and feature quality.  Instead, we found this value in practice that it gives
 good performance in our application.  
+
+
+\subsection{Model inference}
+
+Model inference is performed in a \textit{query-against-support} manner.  A
+query is a SPI hit whose label is to be determined through inference.  In model
+inference, labeled SPI hits from each class are randomly sampled to be used as
+supports.  For example, when working with experimental data, we use three
+support hits representing \textit{non-sample-hit}, \textit{single-hit} and
+\textit{multi-hit}, respectively.  We basically label a query based on the label
+of the most similar hit found in the support set.  Similarity is measured by the
+squared $L2$ distance, which indicates higher similarity if its value becomes
+smaller.  Fig.  \ref{fig : model inference} is an illustration of three queries,
+demonstrating the labeling of a \textit{single-hit} (the first row), a
+\textit{multi-hit} (the second row) and a \textit{non-sample-hit} (the third row)
+.  Meanwhile, a parallel method of model inference is thresholding the distance,
+which brings about an extra hyperparameter to tune.  There is no obvious winner
+as whether \textit{query-against-support} is considerably better than the
+threshold method.  However, when the number of unique classes is smaller, e.g.
+less than four in our case, \textit{query-against-support} eliminates a
+hyperparameter with a minor trade-off of sampling labeled hits to form a support
+set.  We think the threshold method is more preferred when the number of unique
+classes is large, e.g. $\ge 10$.  
+
+\begin{figure}
+\includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]
+{./figures/inference.pdf}
+\caption{
+
+    An illustration of how the model inference is performed.  Each row
+    represents a query against its support.  The predicted label for a query,
+    enclosed in a red border, is inferred by the label of the most similar
+    support, surrounded by a green border, in a support set, where similarity is
+    measured by the squared $L2$ distance between the query and a support.
+    Smaller distnace means more similar and vice versa.  
+
+}
+\label{fig : model inference}
+\end{figure}
