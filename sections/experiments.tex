@@ -12,15 +12,16 @@ the raw data collected in experiment \textit{amo06516}
 \cite{liDiffractionDataAerosolized2020}, part of which are also available in
 CXIDB (ID 156).  One major difference between raw data and deposited data is
 that raw data contain a considerable amount of \textit{non-sample-hit} images,
-which are important for real-time SPI classification tasks.  For data labeling,
+which are important for real-time hit classification tasks.  For data labeling,
 we created a GUI tool (\url{https:
-//github.com/carbonscott/hit-labeler}) that can label hits from multiple sources,
-including raw data through \textit{psana} \cite{damianiLinacCoherentLight2016}
-and HDF5 files from CXIDB.  In total, we labeled 331 \textit{single-hit}, 170
-\textit{multi-hit} and 98 \textit{non-sample-hit}.  In general, smaller size
-dataset leads to less data variety, which is primarily determined by the
-aggregation, orientation and differaction quality of the biological samples.
-Accordingly, we investigate the effects of data variety on model performance.  
+//github.com/carbonscott/hit-labeler}) that allows labeling hits from multiple
+ sources, including raw data through \textit{psana}
+ \cite{damianiLinacCoherentLight2016} and HDF5 files from CXIDB.  In total, we
+ labeled 331 \textit{single-hit}, 170 \textit{multi-hit} and 98
+ \textit{non-sample-hit}.  In general, smaller size dataset leads to less data
+ variety, which is primarily determined by the aggregation, orientation and
+ differaction quality of the biological samples.  Accordingly, we investigate
+ the effects of data variety on model performance.  
 
 
 \subsubsection{Effects of data variety on model performance}
@@ -31,11 +32,11 @@ given dataset.  Data split can be tricky to handle when the size of a given
 dataset is small, which is one of the challenges we will face in training a good
 classifier as SPI data are still being collected.  On the other hand, data
 augmentation can effortlessly increase the volume of the dataset, but can our
-model keep improving performance with more data augmentation?  The short answer
-is `NO', and we think the varieties of uniquely `looking' data would ultimately
-impact model performance.  We point out that when a flat detector is used and
-aligned perpendicularly to the beam path, any rotation of a diffraction image
-along this beam path doesn't add a new variety to the dataset for model
+model keep improving its performance with more data augmentation?  The short
+answer is `NO', and we think the varieties of uniquely `looking' data would
+ultimately impact model performance.  We point out that when a flat detector is
+used and aligned perpendicularly to the beam path, any rotation of a diffraction
+image along this beam path doesn't add a new variety to the dataset for model
 training.  For example, if a training dataset only consists of images generated
 by randomly rotating a reference image along the beam path, our model can
 successfully identify the labels of those augmented images, but it will likely
@@ -46,39 +47,42 @@ and \ref{tb : real performance}, we provide metadata and confusion matrices,
 respectively, of four distinct experiments to demonstrate the effects of data
 variety on model performance.  
 
-We use the same data spliting strategy in experiment 1 and 2, which is 25.0\%
-/37.5\%/73.5\% (train/validate/test) as seen in Table \ref{tb : metadata}.  We
-sample 40 unique images per class, but there are only 18 \textit{non-sample-hit}
-in the training set.  We apply random rotations along the beam path to the
-sampled images, and the total number of images amounts to 2000 for the training
-set and the validation set, respectively.  In experiment 2, similar random
-rotations result in 4000 images in the training set and the validation set,
-respectively.  Despite having double the number of images in training,
+We used the same data partitioning strategy in experiment 1 and 2, which was
+25.0\% /37.5\%/73.5\% (train/validate/test) as seen in Table \ref{tb : metadata}
+.  We sampled 40 unique images per class, but there were only 18
+\textit{non-sample-hit} in the training set.  Then, we applied random rotations
+along the beam path to the sampled images, and the total number of images
+amounted to 2,000 for the training set and the validation set, respectively.
+Here, random rotation was used as a dataset upsampling technique and only
+performed after the dataset was partitioned for preventing ``data leakage''
+issues \cite{kapoorLeakageReproducibilityCrisis2022}.  In experiment 2, similar
+random rotations resulted in 4,000 images in the training set and the validation
+set, respectively.  Despite having double the number of images in training,
 experiment 2 shows a slightly worse performance, especially in the recall of
-predicting \textit{multi-hit} according to Table \ref{tb : real performance} .
+predicting \textit{multi-hit} according to Table \ref{tb : real performance}.
 Since recall measures the percentage of images correctly predicted for a class,
 it implies that the model performance can't be improved through more data
-augmentation.  We then exam whether the data variety is too low when only 25.0\%
-is assigned to the training set, but we still want to use as few images as
-possible.  
+augmentation.  We then examed whether the data variety was too low when only
+25.0\% was assigned to the training set, but still wanted to use as few images
+as possible.  
 
-We choose a new data spliting strategy in experiment 3 and 4, which is 50.0\%
+We chose a new data partitioning strategy in experiment 3 and 4, which was 50.0\%
 /25.0\%/25.0\% (train/validate/test) as depicted in Table \ref{tb : metadata}.
-In experiment 3, we still sample 40 images per class despite having more
+In experiment 3, we still sampled 40 images per class despite having more
 candidates to choose thanks to the 50.0\% data split for training.  Again, we
-apply similar random rotations to the sampled images, and the total number of
-images is 2000 for training and validation, respectively.  As shown in Table
-\ref{tb : real performance}, the model in experiment 3 still can't improve its recall
-of 90\% in predicting \textit{multi-hit}.  It seems to signal that 40 images per
-class is not large enough to cover the data distribution in the training set.
-Then, we decide to sample 80 images per class in experiment 4, despite only 44
-\textit{non-sample-hit} are avaiable in the training set.  A total of 2000
-images for training and validation, respectively, are arranged through the same
-random rotation technique.  In Table \ref{tb : real performance}, the recall of
-predicting \textit{multi-hit} in experiment 4 increases to 97\%, a substantial
-improvement in constrast to $\sim 90\%$ in all previous three experiments.  Fig.
-(\ref{fig : false single real}) gives an overview of \textit{all} failed
-\textit{single-hit} cases in experiment 4.
+applied similar random rotations to the sampled images, and the total number of
+images became 2,000 for training and validation, respectively.  As shown in Table
+\ref{tb : real performance}, the model in experiment 3 still can't improve its
+recall of 90\% in predicting \textit{multi-hit}.  It seems to signal that 40
+images per class is consistently not large enough to cover the data distribution
+of the entire dataset.  Then, we decided to sample 80 images per class in
+experiment 4, despite only 44 \textit{non-sample-hit} were avaiable in the
+training set.  A total of 2,000 images for training and validation, respectively,
+were prepared through the same random rotation technique.  In Table \ref{tb :
+real performance}, the recall of predicting \textit{multi-hit} in experiment 4
+increases to 97\%, a substantial improvement in constrast to $\sim 90\%$ in all
+previous three experiments.  Fig. \ref{fig : false single real} gives an
+overview of \textit{all} failed \textit{single-hit} cases in experiment 4.
 
 %% Two data spliting
 %% strategy are used in the four experiments:  split in experiment 1 and 2; 50.5\%/25.0\%/25.0\% split in
@@ -108,10 +112,10 @@ improvement in constrast to $\sim 90\%$ in all previous three experiments.  Fig.
         \begin{tabularx}{\linewdith}{ l c c c c }
             Experiment &   $\dfrac{Unique \#}{class}$  &  \# (Train) & \# (Validation) & $\dfrac{\text{\#Training}}{\text{\#Total}}$ \\
             \hline
-            1          &   18,40,40             &  2000       & 2000            & 0.25      \\
-            2          &   18,40,40             &  4000       & 4000            & 0.25      \\
-            3          &   40,40,40             &  2000       & 2000            & 0.50      \\
-            4          &   44,80,80             &  2000       & 2000            & 0.50      \\
+            1          &   18;40;40    &  2,000   & 2,000   & 0.25      \\
+            2          &   18;40;40    &  4,000   & 4,000   & 0.25      \\
+            3          &   40;40;40    &  2,000   & 2,000   & 0.50      \\
+            4          &   44;80;80    &  2,000   & 2,000   & 0.50      \\
         \end{tabularx}
     %% }
 \end{table}
@@ -120,41 +124,44 @@ improvement in constrast to $\sim 90\%$ in all previous three experiments.  Fig.
 
 \begin{table}
     \caption{
-        Confusion matrix for each experiment mentioned in Table. \ref{tb :
-        metadata}.
+
+        Confusion matrices for all experiments mentioned in Table \ref{tb :
+        metadata}.  N, S, M stand for \textit{non-sample-hit},
+        \textit{single-hit} and \textit{multi-hit}, respectively.  (A) and (P)
+        represent actual label and predicted label, respectively.  Meanwhile,
+        ACC, PRE, REC and SPE are acronyms for accuracy, precision, recall and
+        specificity, respectively.  
+
     }
 
     \label{tb : real performance}
+    \begin{tabularx}{\linewidth}{ l | X X X X X X X X }
+        \textbf{Experiment 1} &  N(A) & S(A) & M(A) & ACC(\%)  & PRE(\%)  &
+        REC(\%)           & SPE(\%)  & F1(\%)   \\
+        \hline
+        N(P)                  &  335  & 0    & 10   & 99 & 97 & 100          & 98 & 99 \\
+        S(P)                  &  0    & 333  & 24   & 97 & \textbf{93} & 99          & 96 & 96 \\
+        M(P)                  &  0    & 5    & 293  & 96 & 98 & \textbf{90} & 99 & 94 \\
+        \hline
+        \textbf{Experiment 2} &       &       &      &      &      &               &      &      \\
+        \hline
+        N(P)                  &  335  & 1     & 9    & 99 & 97 & 100          & 98 & 99 \\
+        S(P)                  &  0    & 327   & 28   & 96 & \textbf{92} & 97          & 97 & 94 \\
+        M(P)                  &  0    & 10    & 290  & 95 & 97 & \textbf{89} & 99 & 93 \\
+        \hline
+        \textbf{Experiment 3} &       &        &      &      &      &               &      &      \\
+        \hline
+        N(P)                  &  331  & 0      & 13   & 99 & 96 & 100          & 98 & 98 \\
+        S(P)                  &  0    & 339    & 19   & 97 & \textbf{95} & 98          & 97 & 96 \\
+        M(P)                  &  0    & 6      & 292  & 96 & 98 & \textbf{90} & 99 & 94 \\
+        \hline
+        \textbf{Experiment 4} &       &        &      &      &      &               &      &      \\
+        \hline
+        N(P)                  &  331  & 1      & 7    & 99 & 98 & 100          & 99 & 99 \\
+        S(P)                  &  0    & 340    & 4    & 99 & \textbf{99} & 99          & 99 & 99 \\
+        M(P)                  &  0    & 4      & 313  & 98 & 99 & \textbf{97} & 99 & 98 \\
+    \end{tabularx}
 
-    %% \centering
-    %% \renewcommand{\arraystretch}{1.2}
-    %% \resizebox{1.0\columnwidth}{!}{
-        \begin{tabularx}{\linewidth}{ l | X X X X X X X X }
-            \textbf{Experiment 1} &  N(A) & S(A) & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
-            \hline
-            N(P)                  &  335  & 0    & 10   & 0.99 & 0.97 & 1.00          & 0.98 & 0.99 \\
-            S(P)                  &  0    & 333  & 24   & 0.97 & \textbf{0.93} & 0.99          & 0.96 & 0.96 \\
-            M(P)                  &  0    & 5    & 293  & 0.96 & 0.98 & \textbf{0.90} & 0.99 & 0.94 \\
-            \hline
-            \textbf{Experiment 2} &  N(A) & S(A)  & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
-            \hline
-            N(P)                  &  335  & 1     & 9    & 0.99 & 0.97 & 1.00          & 0.98 & 0.99 \\
-            S(P)                  &  0    & 327   & 28   & 0.96 & \textbf{0.92} & 0.97          & 0.97 & 0.94 \\
-            M(P)                  &  0    & 10    & 290  & 0.95 & 0.97 & \textbf{0.89} & 0.99 & 0.93 \\
-            \hline
-            \textbf{Experiment 3} &  N(A) & S(A)   & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
-            \hline
-            N(P)                  &  331  & 0      & 13   & 0.99 & 0.96 & 1.00          & 0.98 & 0.98 \\
-            S(P)                  &  0    & 339    & 19   & 0.97 & \textbf{0.95} & 0.98          & 0.97 & 0.96 \\
-            M(P)                  &  0    & 6      & 292  & 0.96 & 0.98 & \textbf{0.90} & 0.99 & 0.94 \\
-            \hline
-            \textbf{Experiment 4} &  N(A) & S(A)   & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
-            \hline
-            N(P)                  &  331  & 1      & 7    & 0.99 & 0.98 & 1.00          & 0.99 & 0.99 \\
-            S(P)                  &  0    & 340    & 4    & 0.99 & \textbf{0.99} & 0.99          & 0.99 & 0.99 \\
-            M(P)                  &  0    & 4      & 313  & 0.98 & 0.99 & \textbf{0.97} & 0.99 & 0.98 \\
-        \end{tabularx}
-    %% }
 \end{table}
 
 
@@ -163,7 +170,7 @@ improvement in constrast to $\sim 90\%$ in all previous three experiments.  Fig.
 {figures/false_label.single.real.pdf}
 
 \caption{\textit{All} falsely labeled \textit{single-hit} in experiment 4.
-Query images are put into red boxes, whereas the corresponding `most similar'
+Queried images are put into red boxes, whereas the corresponding `most similar'
 supported images chosen by our model are enclosed in green boxes.}
 
 \label{fig : false single real}
@@ -174,7 +181,7 @@ To sum it up, data variety plays a critical role in dictating the model
 performance that requires covering enough data space.  From a practical
 perspective, a good precision of predicting \textit{single-hit} would suffice
 for our use.  However, it is recall that unveils whether the data variety is
-sufficient, which is the underlying limiting factor that prevents model from
+sufficient, which is the underlying limiting factor that prevents the model from
 achieving a better precision.  Additionally, we can label far fewer images for
 model training if a higher error rate is acceptable by the downstream particle
 reconstruction process.  
@@ -183,7 +190,7 @@ reconstruction process.
 \subsubsection{Effects of dead detector areas on model performance}
 
 It's not uncommon to encounter a detector with dead pixel areas during a SPI
-experiment.  We train our model on SPI images artificially occluded by a mask
+experiment.  We trained our model on SPI images artificially occluded by a mask
 half of the size of an image.  We reused the experiment dataset mentioned
 before.  More specifically, We employed 50\% data for model training and 25\%
 data each for validation and testing, respectively.  Apart from image occlusion,
@@ -192,8 +199,8 @@ including image cropping, in-plane random rotation, and downsampling.  Through
 the random in-plane rotation, we prepared 4,000 images for model training.  Our
 model achieves an impressive 100\% (after rounding) precision in predicting
 \textit{single-hit}, as seen in Table \ref{tb : real performance mask}, even
-with half of its diffraction pattern occluded.  Fig. (\ref{fig : true single
-real}) shows a collection of queried hits correctly labeled according to their
+with half of its diffraction pattern occluded.  Fig. \ref{fig : true single
+real} shows a collection of queried hits correctly labeled according to their
 `most similar' support hits.  Overall, this result demonstrates that our model
 can still have good classification performance in the presence of dead pixel
 areas on a detector.  
@@ -202,18 +209,20 @@ areas on a detector.
     \caption{
 
         Confusion matrix for the experiment investigating data occlusion on
-        model performance.
+        model performance.  The acronyms used in this table are consistent with
+        the definitions specified in Table \ref{tb : real performance}.
 
     }
 
     \label{tb : real performance mask}
 
         \begin{tabularx}{\linewidth}{ l | X X X X X X X X }
-                                  &  N(A) & S(A) & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
+                                  &  N(A) & S(A) & M(A) & ACC(\%)  & PRE(\%)  &
+                                  REC(\%)           & SPE(\%)  & F1(\%)   \\
             \hline
-            N(P)                  &  331  & 0    &  5   & 0.99 & 0.99 & 1.00          & 0.99 & 0.99 \\
-            S(P)                  &  0    & 340  &  1   & 0.99 & \textbf{1.00} & 0.99          & 1.00 & 0.99 \\
-            M(P)                  &  0    & 5    & 318  & 0.99 & 0.98 & 0.98 & 0.99 & 0.98 \\
+            N(P)                  &  331  & 0    &  5   & 99 & 99 & 100 & 99 & 99 \\
+            S(P)                  &  0    & 340  &  1   & 99 & \textbf{100} & 99 & 1.00 & 99 \\
+            M(P)                  &  0    & 5    & 318  & 99 & 98 & 98 & 99 & 98 \\
         \end{tabularx}
     %% }
 \end{table}
@@ -224,8 +233,8 @@ areas on a detector.
 {./figures/true_label.single.real.pdf}
 
 \caption{A partial collection of correctly labeled \textit{single-hit} in the
-experiment where SPI images are artificially occluded to mimic the behavior of a
-detector with dead pixel areas.  Query images are put into red boxes, whereas
+experiment where SPI hits are artificially occluded to mimic the behavior of a
+detector with dead pixel areas.  Queried images are put into red boxes, whereas
 the corresponding `most similar' supported images chosen by our model are
 enclosed in green boxes.}
 
@@ -247,14 +256,14 @@ classification can possibly be done in real experiments.
 \subsubsection{Simulated datasets}
 
 There's no existing large scale database of annotated SPI images generated by
-physics-based simulation.  We resort to \textit{skopi}
+physics-based simulation.  We resorted to \textit{skopi}
 \cite{peckSkopiSimulationPackage2022}, a GPU-based program for simulating
 diffractive images from noncrystalline biomolecules, for concurrently simulating
-high-resolution SPI scattering and providing accurate labels in an automated
-manner at scale.  We are mainly interested in \textit{large} single particles,
-considering most biological samples in the past SPI techniques are large virus
-particles.  PDB statistics offers direct insights into PDB data distribution by
-molecular weight (\url{https:
+high-resolution SPI scattering patterns and providing accurate labels in an
+automated manner at scale.  Considering most biological samples in the past SPI
+techniques are large virus particles, we are interested in training our hit
+classifier on \textit{large} single particles.  PDB statistics offers direct
+insights into PDB data distribution by molecular weight (\url{https:
 //www.rcsb.org/stats/distribution-molecular-weight-structure}).  Accordingly, we
 focus on those particles with molecular weights over 380 $KDa$.  Fig.  \ref{fig:
 num atom per bio assem} describes the population frequency of the atom number
@@ -267,13 +276,13 @@ distance at 100.0 $mm$ and photon energy at 1.660 $keV$.  In total, we simulated
 \textit{single-hit} to \textit{quadruple-hit}.  There's no example of
 \textit{non-sample-hit} in the simulated dataset.
 
-We divide PDB entries into a training group and a testing group.  Our model has
+We divided PDB entries into a training group and a testing group.  Our model had
 access to the hits simulated only from the training group during model training
-and validation.  Then, the trained model will be tested against the hits
-simulated only from the PDBs in the testing group.  We choose three ways to
-divide PDBs , which are 10\%/90\%, 50\%/50\% and 80\%/20\% (\%training/\%testing)
-.  The common PDBs in the three testing groups contribute to hits for the
-ultimate testing, which contains 115,200 hits from 1,154 PDBs.  
+and validation.  Then, the trained model were tested against the hits
+simulated only from the PDBs in the testing group.  We chose three ways to
+divide PDBs , which were 10\%/90\%, 50\%/50\% and 80\%/20\% (\%training/\%testing).  
+The common PDBs in the three testing groups contributed to hits for the
+ultimate testing, which contained 115,200 hits from 1,154 PDBs.  
 
 \begin{figure}
 \includegraphics[width=1.0\textwidth,keepaspectratio]
@@ -288,27 +297,27 @@ from Structure Summary pages from RCSB PDB(rcsb.org) of PDB ID
 \end{figure}
 
 
-\subsubsection{Performances}
+\subsubsection{Performance}
 
-Our model achieves a test accuracy from 90.06\% to 93.38\% on SPI hits with no
-noise applied to, which are originally simulated from a diverse collection of
-PDB entries.  We investigate four factors that might impact the model
-performances.  The primary factor is the noise applied to SPI hits.  In
+Our model achieved a test accuracy from 90.06\% to 93.38\% on SPI hits with no
+noise applied to, which were originally simulated from a diverse collection of
+PDB entries.  We investigated four factors that might impact the model
+performances.  The primary factor was the noise applied to SPI hits.  In
 experiment A1 and A2 in Table \ref{tb : simulated performance}, we kept hits
 unperturbed in A1, but applied Poisson noise to hits in A2 followed by Gaussian
 noise at the standard deviation of 0.15.  We trained our model using 200K
 training examples/hits collected from 80\% PDBs.  The margin in the triplet loss
-function is set to be 0.2.  Then, we used 100K hits in the other 20\% PDBs for
+function was set to be 0.2.  Then, we used 100K hits in the other 20\% PDBs for
 testing the model generalizability.  The model in experiment A1 demonstrated an
-accuracy of 93.38\%, whereas the noisy hits in A2 renders the model accuracy
-down to 86.94\%, a 6.44\% decline.  The other three factors, which are \%PDB for
-training, sample size and triplet loss margin, play a secondary role in
+accuracy of 93.38\%, whereas the noisy hits in A2 rendered the model accuracy
+down to 86.94\%, a 6.44\% decline.  The other three factors, which were \%PDB
+for training, sample size and triplet loss margin, played a secondary role in
 dictating the model performance.  Nonetheless, an astonishing finding in
-experiment B3, C3 and D3 is that our model can keep up its accuracy above 90\%
-even when trainied on hits from 10\% of PDBs.  Lastly, sample size and triplet
-loss margin only have diminishing effects on improving model performance.  Fig.
-(\ref{fig : false single simulated}) is an overview of \textit{all} failed
-\textit{single-hit} cases in experiment A2.
+experiment B3, C3 and D3 was that our model kept up its accuracy above 90\% even
+when trained on hits from only 10\% of PDBs.  Lastly, sample size and triplet
+loss margin only turned out to have diminishing effects on improving model
+performance.  Fig.  \ref{fig : false single simulated} is an overview of
+\textit{all} failed \textit{single-hit} cases in experiment A2.
 
 
 \begin{table}
@@ -355,51 +364,49 @@ cleaner visual purposes.  }
 \end{figure}
 
 
-\subsubsection{Revisit consistency of model performance on experimental dataset,
-but with simulation}
-
-%%                single-hit   multi-hit    accuracy   precision      recall specificity          f1
-%% single-hit            477           5        0.99        0.99        1.00        0.99        0.99
-%%  multi-hit              1         517        0.99        1.00        0.99        1.00        0.99
+\subsection{Revisit the model performance observed in experimental dataset,
+but with a larger dataset using simulation}
 
 We've seen great performance of our model on an experimental dataset comprising
-about 600 manually labeled SPI images.  More specifically, our model reached a
+about 600 manually labeled SPI hits.  More specifically, our model reached a
 99\% precision in predicting \textit{single-hit} by training on only 80
 \textit{single-hit}, 80 \textit{multi-hit} and 44 \textit{non-sample-hit}.
-However, can our model perform consistently on a larger size dataset while using
+However, can our model perform consistently on a larger dataset while using
 the same number of training examples?  Complicated by the scarcity of labeled
-experimental datasets, we once again turn to simulating 2,000
+experimental datasets, we once again turned to simulating 2,000
 \textit{single-hit}, 500 \textit{double-hit}, 300 \textit{triplet-hit} and 200
 \textit{quadruple-hit} on an artifical pnCCD detector with \textit{skopi}.
 Similar to the simulated dataset used in the generalizability study, there's no
-\textit{non-sample-hit} class, but we consider everything other than
+\textit{non-sample-hit} class, but we considered everything other than
 \textit{single-hit} as \textit{multi-hit}.  
 
 We set aside 50\% of the simulated hits for training but only limit to 80 hits
-per class visible to our model.  The rest of the dataset are equally divided by
-the validation set and the test set.  Data preprocessing was applied in the same
-manner, which includes applying Possion noise and Gaussian noise, ROI cropping,
-random in-plane rotation and downsampling.  In Table \ref{tb : simulated
-performance large}, the confusion matrix directly illuminates that the model
-delivers an execellent classification performance on a larger size dataset.
-Therefore, we can optimistically conclude that our model can have a consistently
-good performance whilst trained on a small size training set.  
+per class visible to our model.  The rest of the dataset were equally divided by
+the validation set and the test set.  Afterwards, data preprocessing was applied
+in the same manner, which encompassed applying Possion noise and Gaussian noise,
+ROI cropping, random in-plane rotation and downsampling.  In Table \ref{tb :
+simulated performance large}, the confusion matrix directly indicates that the
+model delivers an execellent classification performance on a larger 
+dataset.  Therefore, we can optimistically conclude that our model can have a
+consistently good performance whilst trained on a small size training set.  
 
 \begin{table}
     \caption{
 
         Confusion matrix for the experiment investigating model performance on
-        a larger size dataset.
+        a larger dataset.  The acronyms used in this table are consistent with
+        the definitions specified in Table \ref{tb : real performance}.
 
     }
 
     \label{tb : simulated performance large}
 
         \begin{tabularx}{\linewidth}{ l | X X X X X X X }
-                                  &   S(A) & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
+                                  &   S(A) & M(A) & ACC(\%)  & PRE(\%)  & REC(\%)
+                                  & SPE(\%)  & F1(\%)   \\
             \hline
-            S(P)                  &   477  &  5   & 0.99 & 0.99 & 1.00          & 0.99 & 0.99 \\
-            M(P)                  &   1    & 517  & 0.99 & 1.00 & 0.99 & 1.00 & 0.99 \\
+            S(P)                  &   477  &  5   & 99 & 99 & 100 & 99 & 99 \\
+            M(P)                  &   1    & 517  & 99 & 100 & 99 & 100 & 99 \\
         \end{tabularx}
     %% }
 \end{table}

@@ -1,34 +1,36 @@
 \section{Related work}
 
-\subsection{Classifying hits from SPI images}
+\subsection{Classifying SPI hits}
 
-The task of hits classification from SPI images has been explored for over a
-decade. Prior to the first CXIDB data deposition
-\cite{seibertSingleMimivirusParticles2011} was available to the public, hit
-classification can be performed by evaluating a cross-correlation of two SPI
-images in polar coordinates \cite{bortelClassificationAveragingRandom2009}.  An
-alternative classification approach was based on expectation maximization (EM)
-\cite{dempsterMaximumLikelihoodIncomplete1977}, which is later integrated in EMC
-method \cite{lohReconstructionAlgorithmSingleparticle2009}, a widely applied
-particle reconstruction method in Cryo-EM.  Additionally, a combination of size
-filtering, feature vectors and PCA was used for achieving a better single hit
-classification \cite{bobkovSortingAlgorithmsSingleparticle2015}.  More recently,
-artificial neural network models have become a new avenue for exploring
-classification solutions with the advent of capable infrastructures (GPUs, ML
-frameworks) for model training. \cite{shiEvaluationPerformanceClassification2019}
+The task of SPI hits classification has been explored for over a decade. Prior
+to the first CXIDB data deposition \cite{seibertSingleMimivirusParticles2011}
+was available to the public, hit classification were performed by evaluating a
+cross-correlation of two SPI images in polar coordinates
+\cite{bortelClassificationAveragingRandom2009}.  An alternative classification
+approach was based on expectation maximization (EM)
+\cite{dempsterMaximumLikelihoodIncomplete1977}, which was later integrated in
+the EMC method \cite{lohReconstructionAlgorithmSingleparticle2009}, a widely
+used particle reconstruction method for SPI.  Additionally, a combination of
+size filtering, feature vectors and PCA was used for achieving a better
+\textit{single-hit} classification
+\cite{bobkovSortingAlgorithmsSingleparticle2015}.  More recently, artificial
+neural network models have become a new avenue for exploring classification
+solutions with the advent of capable infrastructures (GPUs, ML frameworks) for
+model training.  For instance, \cite{shiEvaluationPerformanceClassification2019}
 uses a CNN model  and \cite{ignatenkoClassificationDiffractionPatterns2021}
 employs off-the-shell YOLO models \cite{redmonYOLO9000BetterFaster2016,
-redmonYOLOv3IncrementalImprovement2018}.  Both models are trained to performance
-binary classification for identifying \textit{single-hit}.  However, they use a
-fully connected layer (FC) as the classifier that is directly attached to their
-vision modules (CNN).  This design has been known for its inefficiency to train
-as pointed out in \cite{schroffFaceNetUnifiedEmbedding2015}.  It turned out the
-YOLO model in \cite{ignatenkoClassificationDiffractionPatterns2021} takes more
-than three hours to train before it achieves an accuracy of 95\% in predicting
-single hits.  The training time is not clear in
+redmonYOLOv3IncrementalImprovement2018}.  Both models were trained to
+performance binary classification for identifying \textit{single-hit}.  However,
+they all used a fully connected layer (FC) as the classifier that is directly
+attached to their vision modules (CNN).  This design has been known for its
+inefficiency in model training as pointed out in
+\cite{schroffFaceNetUnifiedEmbedding2015}.  Notably, the YOLO model in
+\cite{ignatenkoClassificationDiffractionPatterns2021} takes more than three
+hours to train before it achieves an accuracy of 95\% in predicting single hits.
+The training time is not clear in
 \cite{shiEvaluationPerformanceClassification2019}, but its accuracy is 83.8\%.
-In contrast, our model demonstrates high accuracy while keeping training time
-short.  
+In contrast, our model demonstrates high accuracy on experimental data while
+keeping the training time short.  
 
 
 \subsection{Generalizing a classifier}
@@ -40,23 +42,23 @@ verification using a siamese neural network
 \cite{bromleySignatureVerificationUsing1994}.  The model basically measures the
 distance between two signature embeddings generated from two identical neural
 networks, which learn to seperate embeddings of different signatures in a latent
-space and vice versa.  The idea of siamese networks are later applied in face
+space and vice versa.  The idea of siamese networks were later applied in face
 recognition/verification \cite{chopraLearningSimilarityMetric2005}.  In the last
-decade, another breakthrough in face recognition is demonstrated by the use of
+decade, another breakthrough in face recognition was demonstrated by the use of
 triplet loss in \cite{kochSiameseNeuralNetworks2015a}, where both a positive
-example and a negative example are constrated against an anchor example. Beyound
-signature or face verification, few-shot learning problems also require
+image and a negative image are constrated against the same anchor image.
+Beyound signature or face verification, few-shot learning problems also require
 generalizing an existing classifier to identifying new categories of things not
 seen by the model before.  For example, \cite{vinyalsMatchingNetworksOne2017}
-introduced ``matching networks" that learn to query an unlabeleed example
-against examples in a small support set that have new labels.
+introduced ``matching networks" that learn to query an unlabeleed image against
+images in a small support set that have new labels.
 \cite{snellPrototypicalNetworksFewshot2017} proposed a prototypical network that
 learns a metric space where classification is effecetively done by measuring
-distances between the representation of an unlabelled example and the prototype
-representation of each new class.  In our application, we choose to use triplet
+distances between an unlabelled image and the prototype representation, such as
+the average, of each new class.  In our application, we choose to use triplet
 loss method to train a SPI hit classifier.  In contrast to the thresholding in
 FaceNet which requires tuning an additional hyperparameter, our model treats an
 input image as a query item, which is then subject to similarity tests against
-precomputed embeddings from each hit class.  This approach is also easy to
-implement because the number of hit classes is three as opposed to faces of
-incredibly many new identities in face verification problem.  
+embeddings from each hit class.  This approach is also easy to implement because
+the number of hit classes is three as opposed to faces of much more new
+identities in face verification problem.  

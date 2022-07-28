@@ -19,33 +19,32 @@
 
 
 
-\section{Our model and training strategy for real-time hit classification}
+\section{Our model and the training strategy}
 
-The goal of our model is to identify \textit{single-hit} while a SPI diffraction
-data collection is underway.  From a model perspective, we essentially use the
+The practical goal of our model is to identify \textit{single-hit} while data
+collection is still underway.  From a model perspective, we essentially use the
 same neural network architecture to create an experiment-specific hit classifier
 and a generalized hit classifier.  We focus more on explaining how our
 experiment-specific classifier works, considering it will have an immediate
-impact on real-time classification.  We illustrate the training strategy of a
-generalized model afterwards.  
+impact on real-time classification.  
 
 
 \subsection{CNN vision backbone}
 
 Our CNN vision backbone consists of two convolutional layers that extract image
-features and two fully connected layers that compress image features into low
-dimensional embeddings.  The first convolutional layer uses a $5 \times 5$
+features and two fully connected layers that compress these image features into
+a low dimensional embedding.  The first convolutional layer uses a $5 \times 5$
 single channel filter with a stride of one and no padding.  The second
 convolutional layer employs a 32-channel $5 \times 5$ filter with a with a
 stride of one and no padding.  A ReLU activation function is applied to the
 outcome of each convolutional layer, which is followed by a max-pooling
 operation performed by a $2\times 2$ filter with a stride of two.  Then, two
 fully connected layer are used to generate the final embedding with the size of
-128.  As a result, all SPI diffraction images are encoded into embeddings in a
-latent space, where embedding distance between two images, estimated with $L2$
-squared distance, is a measurement of their similarities.  Expectedly,
-identically labeled hits should have a small embedding distance, whereas
-differently labeled hits should have a large embedding distance.  
+128.  As a result, all SPI hits are encoded into embeddings in a latent space,
+where embedding distance between two images, estimated by a squared $L2$
+distance, is a measurement of their similarities.  Expectedly, identically
+labeled hits should have a small embedding distance, whereas differently labeled
+hits should have a large embedding distance.  
 
 % Maybe discuss how many parameters are involved depending on the image cropping
 % and downsizing in data preprocess.  
@@ -144,8 +143,8 @@ one class;  (2) Randomly sample two examples from the chosen class;  (3)
 Randomly sample one example from any class other than the chosen class.  This
 method, despite being easy to implement, might not deliver fast convergence when
 there are many easy triplets.  We consider three kinds of triplets that might
-exist during model training: easy, semi-hard and hard shown in Fig. (\ref{fig:
-semi-hard}).  In an easy triplet, the negative example is already separated by
+exist during model training: easy, semi-hard and hard shown in Fig. \ref{fig:
+semi-hard}.  In an easy triplet, the negative example is already separated by
 at at leats a margin of $\alpha$ than the positive example.  In a hard triplet,
 the negative example is actually closer to the anchor than the positive is.  In
 a semi-hard triplet, the negative example still stays more apart from the anchor
@@ -212,7 +211,7 @@ distribution with a mean of $0.0$ and a standard deviation of $0.2$.
 \subsection{Data preprocessing}
 
 We preprocessed SPI hit images in our application for three major reasons:
-highlight features, upscale datasets and reduce image size.  Firstly, a typical
+highlight features, upsample datasets and reduce image size.  Firstly, a typical
 way to highlight image features is to zoom in on the region of interest (ROI) if
 available.  In SPI diffraction images, features are predominantly located near
 the X-ray beam center and areas remote to the center have much weaker signals.
@@ -228,6 +227,15 @@ panels and two for data obtained from a simple square detector.  We don't have
 an evidence to conclude those values of downsampling would always give the best
 trade-off between reducing size and perserving features.  Instead, we found them
 offering good enough performances through practices.  
+
+An important caveat of upsampling our dataset is to only perform it after the
+dataset is partitioned into training set and test set.  Otherwise, it will lead
+to notorious ``data leakage'' issues explained in
+\cite{kapoorLeakageReproducibilityCrisis2022}.  A typical consequence of ``data
+leakage'' is the delusionally excellent performance of model inference during
+testing, where in fact the test set already encompasses upsampled data
+``leaked'' from the training set.  In another word, the ``good'' performance is
+mostly caused by model memorization or overfitting.  
 
 
 \subsection{Model inference}
