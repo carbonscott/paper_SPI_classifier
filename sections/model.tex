@@ -44,8 +44,8 @@ fully connected layer are used to generate the final embedding with the size of
 128.  As a result, all SPI diffraction images are encoded into embeddings in a
 latent space, where embedding distance between two images, estimated with $L2$
 squared distance, is a measurement of their similarities.  Expectedly,
-identically labelled hits should have a small embedding distance, whereas
-differently labelled hits should have a large embedding distance.  
+identically labeled hits should have a small embedding distance, whereas
+differently labeled hits should have a large embedding distance.  
 
 % Maybe discuss how many parameters are involved depending on the image cropping
 % and downsizing in data preprocess.  
@@ -54,8 +54,16 @@ differently labelled hits should have a large embedding distance.
 %% \renewcommand{\arraystretch}{1.4}
 %% pnCCD: 
 \begin{table}
-\caption{The architecture of the CNN vision backbone.
-{\color{red} This whole table can be replaced by an illustrative figure.}}
+\caption{
+
+    The architecture of the CNN vision backbone.  We only specify architectural
+    parameters that are independent of input image dimensions.  The benefit is
+    that those parameters can be readily used in machine learning frameworks,
+    such as PyTorch or Tensorflow.  The exact value of $*$ in the layer ``FC 3"
+    depends on the input image size, and can be figured out during the
+    initialization of the network.  
+
+}
 %% \resizebox{1.0\textwidth}{!}{
     \begin{tabularx}{\textwidth}{   l | l l X X X  }
         Layer       &  In channels    & Out channels    & Kernel size & Stride       & Padding     \\
@@ -93,11 +101,11 @@ different from the negative.  Two pairs will be put into a comparison in the
 model. The postive pair contains the anchor and the positive $(x^a, x^p)$,
 whereas the negative pair include the anchor and the negative $(x^a, x^n)$.
 During training, three identical CNNs $f$ extract features from a triplet $(x^a,
-x^p, x^n)$, while another component in the model measures the squared $L_2$
+x^p, x^n)$, while another component in the model measures the squared $L2$
 distance in the positive pair $\|f(x^a) - f(x^p)\|_2^2$ and the negative pair
 $\|f(x^a) - f(x^n) \|_2^2$, respectively.  The objective of training our CNN $f$
 is to separate the negative pair $(f(x^a), f(x^n))$ more than the the positive
-pair $(f(x^a), f(x^p))$ by at least a margin $\alpha$.  Suppose there are $N$
+pair $(f(x^a), f(x^p))$ by at least a margin of $\alpha$.  Suppose there are $N$
 triplets, the objective can be stated as 
 
 \newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak}
@@ -111,9 +119,9 @@ Meanwhile, we enforce that every embedding has a unit length of one in a
 $d$-dimensional latent space, namely $f(x) \in \mathbb{R}^d$ and $\|f(x)
 \|_2=1$. It means that a SPI diffraction image will be mapped to a single point
 on a $d$-dimensional hypersphere with a radius of one.  We can expect
-identically labelled hits will get closer over the course of training and
+identically labeled hits will get closer over the course of training and
 eventually form a cluster.  The average distance between two clusters will
-ultimately be at least $\alpha$ in a squared $L_2$ norm sense. The largest value
+ultimately be at least $\alpha$ in a squared $L2$ norm sense. The largest value
 of a possible $\alpha$ is 4. Since we consider only three classes, there is
 plenty of room to fit them on a hypersphere.  As a result, the value of $\alpha$
 can take on many values.  FaceNet choose a very small $\alpha$ because they need
@@ -203,24 +211,23 @@ distribution with a mean of $0.0$ and a standard deviation of $0.2$.
 
 \subsection{Data preprocessing}
 
-The reasons of employing data preprocessing are three-fold in our application:
+We preprocessed SPI hit images in our application for three major reasons:
 highlight features, upscale datasets and reduce image size.  Firstly, a typical
 way to highlight image features is to zoom in on the region of interest (ROI) if
 available.  In SPI diffraction images, features are predominantly located near
 the X-ray beam center and areas remote to the center have much weaker signals.
-Based on this observation, we decide to do image cropping by only keeping the
-pixels in a user-specified ROI.  Secondly, a diffraction image collected in a
-SPI experiment won't change its nature after an in-plane rotation with the beam
-path as the rotational axis.  This characteristic allows us to upscale our
-dataset by applying random in-plane rotation, which ultimately teaches our model
-that a particular form of diffraction image can re-appear in an experiment
-except it differs by some rotation.  It's worth noting that any hit class, e.g.
+Based on this observation, we decide to crop images by only keeping the pixels
+in a user-specified ROI.  Secondly, a diffraction image collected in a SPI
+experiment won't change its nature after an in-plane rotation with the beam path
+as the rotational axis.  This feature allows us to upscale our dataset by
+applying random in-plane rotations.  It's worth noting that any hit class, e.g.
 \textit{single-hit}, can have various forms but random rotation cannot alter any
-unique form of a class to resemble another one.  Lastly, we downsample
-diffraction images in our dataset by a factor of 6.  We don't have an evidence
-to conclude that the factor of 6 gives the best trade-off between size reduction
-and feature quality.  Instead, we found this value in practice that it gives
-good performance in our application.  
+unique form of a class to resemble another one.  Lastly, we downsampled
+diffraction images in our dataset by a factor of six for data collected in pnCCD
+panels and two for data obtained from a simple square detector.  We don't have
+an evidence to conclude those values of downsampling would always give the best
+trade-off between reducing size and perserving features.  Instead, we found them
+offering good enough performances through practices.  
 
 
 \subsection{Model inference}
@@ -242,7 +249,7 @@ as whether \textit{query-against-support} is considerably better than the
 threshold method.  However, when the number of unique classes is smaller, e.g.
 less than four in our case, \textit{query-against-support} eliminates a
 hyperparameter with a minor trade-off of sampling labeled hits to form a support
-set.  We think the threshold method is more preferred when the number of unique
+set.  We think the threshold method is a better choice when the number of unique
 classes is large, e.g. $\ge 10$.  
 
 \begin{figure}

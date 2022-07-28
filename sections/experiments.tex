@@ -7,59 +7,20 @@
 To our knowledge, there's no existing large scale database of annotated X-ray
 single particle images categorized by biological/chemical samples.  The Coherent
 X-ray Data Bank (CXIDB) serves as ``a permanent public repository of data from
-coherent X-ray sources" \cite{maiaCoherentXrayImaging2012}.  Table \ref{tb: SPI
-experiments} is a list of all SPI experiments documented on CXIDB.  We decide to
-use the raw data collected in experiment amo06516
-\cite{liDiffractionDataAerosolized2020}, part of which are also available by
-checking out CXIDB ID 156.  One major difference between raw data and deposited
-data is that raw data contain a considerable amount of \textit{non-sample-hit}
-images, which are important for real-time SPI classification tasks.  For data
-labelling, we created a GUI tool (\url{https:
+coherent X-ray sources" \cite{maiaCoherentXrayImaging2012}.  We decide to use
+the raw data collected in experiment \textit{amo06516}
+\cite{liDiffractionDataAerosolized2020}, part of which are also available in
+CXIDB (ID 156).  One major difference between raw data and deposited data is
+that raw data contain a considerable amount of \textit{non-sample-hit} images,
+which are important for real-time SPI classification tasks.  For data labeling,
+we created a GUI tool (\url{https:
 //github.com/carbonscott/hit-labeler}) that can label hits from multiple sources,
 including raw data through \textit{psana} \cite{damianiLinacCoherentLight2016}
-and HDF5 files from CXIDB.  In total, we labelled 331 \textit{single-hit}, 170
-\textit{multi-hit} and 98 \textit{non-sample-hit}.  
-
-\begin{table}
-    \caption{All SPI experiments documented on CXIDB.}
-    \label{tb: SPI experiments}
-    %% \renewcommand{\arraystretch}{1.2}
-    %% \resizebox{1.0\textwidth}{!}{
-        \begin{tabularx}{\textwidth}{ l l X }
-            CXIDB ID & Light Source & Sample \\
-            \hline
-            1        & LCLS         & Mimivirus                                                       \\
-            2        & LCLS         & Mimivirus                                                       \\
-            3        & FLASH        & FIB etched 20-nm-thick silicon nitride membrane                 \\
-            4-8      & ALS          & Gold labeled frozen dried Saccharomyces cerevisiae yeast cells  \\
-            9        & FLASH        & Iron Oxide Ellipsoids                                           \\
-            10       & LCLS         & Nanorice                                                        \\
-            11       & LCLS         & Magnetosomes                                                    \\
-            12       & LCLS         & Tobacco mosaic virus                                            \\
-            13       & LCLS         & T4 bacteriophage                                                \\
-            14       & LCLS         & Paramecium bursaria Chlorella virus                             \\
-            19       & LCLS         & Airborne Particulate Matter (Soot)                              \\
-            20       & LCLS         & Clusters of Polystyrene Spheres                                 \\
-            25       & LCLS         & Carboxysomes                                                    \\
-            26       & LCLS         & Cyanobium gracile                                               \\
-            27       & LCLS         & Synechococcus elongatus                                         \\
-            28       & ALS          & 50 nm colloidal gold particles                                  \\
-            30       & LCLS         & Mimivirus                                                       \\
-            36       & LCLS         & Rice Dwarf Virus                                                \\
-            37       & LCLS         & Cyanobium gracile and Synechococcus elongtatus                  \\
-            56       & LCLS         & Omono River Virus                                               \\
-            57       & LCLS         & Gold core and palladium shell nanoparticles                     \\
-            58       & LCLS         & Coliphage PR772                                                 \\
-            78       & LCLS         & RNA polymerase II                                               \\
-            84       & ESRF         & Gold structure (largest diameter about 1.1 um)                  \\
-            88       & LCLS         & PR772                                                           \\
-            119      & LCLS         & Sucrose                                                         \\
-            146      & FLASH        & Xenon nanoclusters                                              \\
-            155      & LCLS         & Melbournevirus                                                  \\
-            156      & LCLS         & Coliphage PR772                                                 \\
-        \end{tabularx}
-    %% }
-\end{table}
+and HDF5 files from CXIDB.  In total, we labeled 331 \textit{single-hit}, 170
+\textit{multi-hit} and 98 \textit{non-sample-hit}.  In general, smaller size
+dataset leads to less data variety, which is primarily determined by the
+aggregation, orientation and differaction quality of the biological samples.
+Accordingly, we investigate the effects of data variety on model performance.  
 
 
 \subsubsection{Effects of data variety on model performance}
@@ -67,11 +28,11 @@ and HDF5 files from CXIDB.  In total, we labelled 331 \textit{single-hit}, 170
 We split our experimental dataset into training set, validation set and test
 set.  This is a standard practice that evaluates the goodness of a model on a
 given dataset.  Data split can be tricky to handle when the size of a given
-dataset is small, which is one of the challenges we will face in training a
-real-time classifier during data collection.  On the other hand, data
+dataset is small, which is one of the challenges we will face in training a good
+classifier as SPI data are still being collected.  On the other hand, data
 augmentation can effortlessly increase the volume of the dataset, but can our
-model achieve infinitely better performance with data augmentation?  The short
-answer is `NO', and we will discuss how the varieties of uniquely `looking' data
+model keep improving performance with more data augmentation?  The short answer
+is `NO', and we think the varieties of uniquely `looking' data would ultimately
 impact model performance.  We point out that when a flat detector is used and
 aligned perpendicularly to the beam path, any rotation of a diffraction image
 along this beam path doesn't add a new variety to the dataset for model
@@ -79,9 +40,9 @@ training.  For example, if a training dataset only consists of images generated
 by randomly rotating a reference image along the beam path, our model can
 successfully identify the labels of those augmented images, but it will likely
 fail to recognize images with other unique patterns.  We consider that every
-manually labelled image looks uniquely as the chance of labelling two images
+manually labeled image looks uniquely as the chance of labeling two images
 differed by a matter of rotation is very little.  In Table \ref{tb : metadata}
-and \ref{tb : performance}, we provide metadata and confusion matrices,
+and \ref{tb : real performance}, we provide metadata and confusion matrices,
 respectively, of four distinct experiments to demonstrate the effects of data
 variety on model performance.  
 
@@ -94,11 +55,12 @@ set and the validation set, respectively.  In experiment 2, similar random
 rotations result in 4000 images in the training set and the validation set,
 respectively.  Despite having double the number of images in training,
 experiment 2 shows a slightly worse performance, especially in the recall of
-predicting \textit{multi-hit} according to Table \ref{tb : performance} .  Since
-recall measures the percentage of images correctly predicted for a class, it
-implies that the model performance can't be improved through more data
-augmentation.  We hypothesize that the data variety is still too low when only
-25.0\% is assigned to the training set.  
+predicting \textit{multi-hit} according to Table \ref{tb : real performance} .
+Since recall measures the percentage of images correctly predicted for a class,
+it implies that the model performance can't be improved through more data
+augmentation.  We then exam whether the data variety is too low when only 25.0\%
+is assigned to the training set, but we still want to use as few images as
+possible.  
 
 We choose a new data spliting strategy in experiment 3 and 4, which is 50.0\%
 /25.0\%/25.0\% (train/validate/test) as depicted in Table \ref{tb : metadata}.
@@ -106,27 +68,17 @@ In experiment 3, we still sample 40 images per class despite having more
 candidates to choose thanks to the 50.0\% data split for training.  Again, we
 apply similar random rotations to the sampled images, and the total number of
 images is 2000 for training and validation, respectively.  As shown in Table
-\ref{tb : performance}, the model in experiment 3 still can't improve its recall
+\ref{tb : real performance}, the model in experiment 3 still can't improve its recall
 of 90\% in predicting \textit{multi-hit}.  It seems to signal that 40 images per
 class is not large enough to cover the data distribution in the training set.
 Then, we decide to sample 80 images per class in experiment 4, despite only 44
 \textit{non-sample-hit} are avaiable in the training set.  A total of 2000
 images for training and validation, respectively, are arranged through the same
-random rotation technique.  In Table \ref{tb : performance}, the recall of
+random rotation technique.  In Table \ref{tb : real performance}, the recall of
 predicting \textit{multi-hit} in experiment 4 increases to 97\%, a substantial
-improvement in constrast to $\sim 90\%$ in all previous three experiments.  
-
-To sum it up, data variety plays a critical role in dictating the model
-performance by covering the data space.  From a practical perspective, a good
-precision of predicting \textit{single-hit} would suffice for our use that is to
-keep only \textit{single-hit}.  However, it is recall that indicates whether the
-data variety is sufficient, which is the underlying limiting factor that
-prevents model from achieving a better precision.  Furthermore, it is not clear
-what the maximum acceptable error rate is that allows the downstream particle
-reconstruction process to work properly.  If the target \textit{single-hit}
-precision is 90\%, we can label far fewer images for model training.  
-
-
+improvement in constrast to $\sim 90\%$ in all previous three experiments.  Fig.
+(\ref{fig : false single real}) gives an overview of \textit{all} failed
+\textit{single-hit} cases in experiment 4.
 
 %% Two data spliting
 %% strategy are used in the four experiments:  split in experiment 1 and 2; 50.5\%/25.0\%/25.0\% split in
@@ -146,7 +98,7 @@ precision is 90\%, we can label far fewer images for model training.
         \textit{multi-hit}.  \# (Train) and \# (Validation) are the number of images,
         including those generated from data augmentation, used in model training and
         validation, respectively.  The last column tells the fraction of all
-        labelled images used in the training set.  
+        labeled images used in the training set.  
     }
     \label{tb : metadata}
     %% \renewcommand{\arraystretch}{1.2}
@@ -172,7 +124,7 @@ precision is 90\%, we can label far fewer images for model training.
         metadata}.
     }
 
-    \label{tb : performance}
+    \label{tb : real performance}
 
     %% \centering
     %% \renewcommand{\arraystretch}{1.2}
@@ -181,41 +133,107 @@ precision is 90\%, we can label far fewer images for model training.
             \textbf{Experiment 1} &  N(A) & S(A) & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
             \hline
             N(P)                  &  335  & 0    & 10   & 0.99 & 0.97 & 1.00          & 0.98 & 0.99 \\
-            S(P)                  &  0    & 333  & 24   & 0.97 & 0.93 & 0.99          & 0.96 & 0.96 \\
+            S(P)                  &  0    & 333  & 24   & 0.97 & \textbf{0.93} & 0.99          & 0.96 & 0.96 \\
             M(P)                  &  0    & 5    & 293  & 0.96 & 0.98 & \textbf{0.90} & 0.99 & 0.94 \\
             \hline
             \textbf{Experiment 2} &  N(A) & S(A)  & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
             \hline
             N(P)                  &  335  & 1     & 9    & 0.99 & 0.97 & 1.00          & 0.98 & 0.99 \\
-            S(P)                  &  0    & 327   & 28   & 0.96 & 0.92 & 0.97          & 0.97 & 0.94 \\
+            S(P)                  &  0    & 327   & 28   & 0.96 & \textbf{0.92} & 0.97          & 0.97 & 0.94 \\
             M(P)                  &  0    & 10    & 290  & 0.95 & 0.97 & \textbf{0.89} & 0.99 & 0.93 \\
             \hline
             \textbf{Experiment 3} &  N(A) & S(A)   & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
             \hline
             N(P)                  &  331  & 0      & 13   & 0.99 & 0.96 & 1.00          & 0.98 & 0.98 \\
-            S(P)                  &  0    & 339    & 19   & 0.97 & 0.95 & 0.98          & 0.97 & 0.96 \\
+            S(P)                  &  0    & 339    & 19   & 0.97 & \textbf{0.95} & 0.98          & 0.97 & 0.96 \\
             M(P)                  &  0    & 6      & 292  & 0.96 & 0.98 & \textbf{0.90} & 0.99 & 0.94 \\
             \hline
             \textbf{Experiment 4} &  N(A) & S(A)   & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
             \hline
             N(P)                  &  331  & 1      & 7    & 0.99 & 0.98 & 1.00          & 0.99 & 0.99 \\
-            S(P)                  &  0    & 340    & 4    & 0.99 & 0.99 & 0.99          & 0.99 & 0.99 \\
+            S(P)                  &  0    & 340    & 4    & 0.99 & \textbf{0.99} & 0.99          & 0.99 & 0.99 \\
             M(P)                  &  0    & 4      & 313  & 0.98 & 0.99 & \textbf{0.97} & 0.99 & 0.98 \\
         \end{tabularx}
     %% }
 \end{table}
 
 
-% Insert the figure HERE and TOP..
 \begin{figure}
 \includegraphics[width=\textwidth,keepaspectratio]
 {figures/false_label.single.real.pdf}
-\caption{Falsely labeled \textit{single-hit} in our test experimental dataset.}
+
+\caption{\textit{All} falsely labeled \textit{single-hit} in experiment 4.
+Query images are put into red boxes, whereas the corresponding `most similar'
+supported images chosen by our model are enclosed in green boxes.}
+
 \label{fig : false single real}
 \end{figure}
 
 
-\subsection{Assess one-model-fits-all scenario using simulated hits}
+To sum it up, data variety plays a critical role in dictating the model
+performance that requires covering enough data space.  From a practical
+perspective, a good precision of predicting \textit{single-hit} would suffice
+for our use.  However, it is recall that unveils whether the data variety is
+sufficient, which is the underlying limiting factor that prevents model from
+achieving a better precision.  Additionally, we can label far fewer images for
+model training if a higher error rate is acceptable by the downstream particle
+reconstruction process.  
+
+
+\subsubsection{Effects of dead detector areas on model performance}
+
+It's not uncommon to encounter a detector with dead pixel areas during a SPI
+experiment.  We train our model on SPI images artificially occluded by a mask
+half of the size of an image.  We reused the experiment dataset mentioned
+before.  More specifically, We employed 50\% data for model training and 25\%
+data each for validation and testing, respectively.  Apart from image occlusion,
+the same data preprocessing procedures used in experiment 2 were also applied,
+including image cropping, in-plane random rotation, and downsampling.  Through
+the random in-plane rotation, we prepared 4,000 images for model training.  Our
+model achieves an impressive 100\% (after rounding) precision in predicting
+\textit{single-hit}, as seen in Table \ref{tb : real performance mask}, even
+with half of its diffraction pattern occluded.  Fig. (\ref{fig : true single
+real}) shows a collection of queried hits correctly labeled according to their
+`most similar' support hits.  Overall, this result demonstrates that our model
+can still have good classification performance in the presence of dead pixel
+areas on a detector.  
+
+\begin{table}
+    \caption{
+
+        Confusion matrix for the experiment investigating data occlusion on
+        model performance.
+
+    }
+
+    \label{tb : real performance mask}
+
+        \begin{tabularx}{\linewidth}{ l | X X X X X X X X }
+                                  &  N(A) & S(A) & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
+            \hline
+            N(P)                  &  331  & 0    &  5   & 0.99 & 0.99 & 1.00          & 0.99 & 0.99 \\
+            S(P)                  &  0    & 340  &  1   & 0.99 & \textbf{1.00} & 0.99          & 1.00 & 0.99 \\
+            M(P)                  &  0    & 5    & 318  & 0.99 & 0.98 & 0.98 & 0.99 & 0.98 \\
+        \end{tabularx}
+    %% }
+\end{table}
+
+
+\begin{figure}
+\includegraphics[width=\textwidth,keepaspectratio]
+{./figures/true_label.single.real.pdf}
+
+\caption{A partial collection of correctly labeled \textit{single-hit} in the
+experiment where SPI images are artificially occluded to mimic the behavior of a
+detector with dead pixel areas.  Query images are put into red boxes, whereas
+the corresponding `most similar' supported images chosen by our model are
+enclosed in green boxes.}
+
+\label{fig : true single real}
+\end{figure}
+
+
+\subsection{Model generalizability assessed using simulated hits}
 
 According to the FaceNet paper \cite{schroffFaceNetUnifiedEmbedding2015}, a CNN
 vision core trained through triplet loss function can identify faces of nearly 8
@@ -233,36 +251,39 @@ physics-based simulation.  We resort to \textit{skopi}
 \cite{peckSkopiSimulationPackage2022}, a GPU-based program for simulating
 diffractive images from noncrystalline biomolecules, for concurrently simulating
 high-resolution SPI scattering and providing accurate labels in an automated
-manner at scale.  We are primarily interested in \textit{large} single particles,
-considering the state-of-art resolution ever reached in an SPI experiment is
-still at the nanometer level ($>$ 10 $nm$) {\color{red} (need to fact-check)}.
-PDB statistics offers direct insights into PDB data distribution by molecular
-weight (\url{https:
+manner at scale.  We are mainly interested in \textit{large} single particles,
+considering most biological samples in the past SPI techniques are large virus
+particles.  PDB statistics offers direct insights into PDB data distribution by
+molecular weight (\url{https:
 //www.rcsb.org/stats/distribution-molecular-weight-structure}).  Accordingly, we
 focus on those particles with molecular weights over 380 $KDa$.  Fig.  \ref{fig:
-num atom per bio assem} describes the population frequency of the atom numbers
+num atom per bio assem} describes the population frequency of the atom number
 per biological assembly with each area representing 50 PDB items.  The atom
 numbers spread across three orders of magnitudes ($10^4\text{-}10^6$).  96.0\%
 of \textit{large} particles have $10^4$ atoms, and only 1.2\% have massive
 $10^6$ atom numbers. Simulated datasets are generated by setting the detector
 distance at 100.0 $mm$ and photon energy at 1.660 $keV$.  In total, we simulated
 0.5 million SPI hits from 5,778 PDB entries, and the type of hit ranges from
-\textit{single-hit} to \textit{quadruple-hit}.  There's no cases of
+\textit{single-hit} to \textit{quadruple-hit}.  There's no example of
 \textit{non-sample-hit} in the simulated dataset.
 
 We divide PDB entries into a training group and a testing group.  Our model has
 access to the hits simulated only from the training group during model training
-and validation.  A trained model will be tested against the hits simulated only
-from the PDBs in the testing group.  We choose three ways to divide PDBs
-, which are 10\%/90\%, 50\%/50\% and 80\%/20\% (\%training/\%testing).
-The common PDBs in the three testing groups contribute to hits for the ultimate
-testing, which contains 115,200 hits from 1,154 PDBs.  
+and validation.  Then, the trained model will be tested against the hits
+simulated only from the PDBs in the testing group.  We choose three ways to
+divide PDBs , which are 10\%/90\%, 50\%/50\% and 80\%/20\% (\%training/\%testing)
+.  The common PDBs in the three testing groups contribute to hits for the
+ultimate testing, which contains 115,200 hits from 1,154 PDBs.  
 
 \begin{figure}
 \includegraphics[width=1.0\textwidth,keepaspectratio]
 {./figures/num_atom_per_bio_assem.pdf}
-\caption{Number of atom per biological assembly. {\color{red} Need to indicate where
-those molecular graphs are from.}}
+
+\caption{Number of atoms per biological assembly.  Molecular images are taken
+from Structure Summary pages from RCSB PDB(rcsb.org) of PDB ID
+5VFR\cite{zhuStructuralMechanismNucleotidedriven2018}, 5IJO\cite{kosinskiMolecularArchitectureInner2016} and
+3ZIF\cite{chengCryoEMStructuresTwo2014}.}
+
 \label{fig: num atom per bio assem}
 \end{figure}
 
@@ -270,28 +291,30 @@ those molecular graphs are from.}}
 \subsubsection{Performances}
 
 Our model achieves a test accuracy from 90.06\% to 93.38\% on SPI hits with no
-noise applied to, which are simulated from a diverse collection of PDB entries.
-In contrast, a human level performance is about {\color{red}XXXX}.  We
-investigate four factors that might impact the model performances.  The primary
-factor is the noise applied to SPI hits.  In experiment A1 and A2 in Table
-\ref{tb : performance}, we kept hits unperturbed in A1, but applied Poisson
-noise to hits in A2 followed by Gaussian noise at the standard deviation
-({\color{red}$\sigma$}) of 0.15.  We trained our model using 200K training
-examples/hits collected from 80\% PDBs.  The margin in the triplet loss function
-is set to be 0.2.  Then, we used 100K hits in the other 20\% PDBs for testing
-the model generalizability.  The model in experiment A1 demonstrated an accuracy
-of 93.38\%, whereas the noisy hits in A2 renders the model accuracy down to
-86.94\%, a 6.44\% decline.  The other three factors, which are \%PDB for
+noise applied to, which are originally simulated from a diverse collection of
+PDB entries.  We investigate four factors that might impact the model
+performances.  The primary factor is the noise applied to SPI hits.  In
+experiment A1 and A2 in Table \ref{tb : simulated performance}, we kept hits
+unperturbed in A1, but applied Poisson noise to hits in A2 followed by Gaussian
+noise at the standard deviation of 0.15.  We trained our model using 200K
+training examples/hits collected from 80\% PDBs.  The margin in the triplet loss
+function is set to be 0.2.  Then, we used 100K hits in the other 20\% PDBs for
+testing the model generalizability.  The model in experiment A1 demonstrated an
+accuracy of 93.38\%, whereas the noisy hits in A2 renders the model accuracy
+down to 86.94\%, a 6.44\% decline.  The other three factors, which are \%PDB for
 training, sample size and triplet loss margin, play a secondary role in
 dictating the model performance.  Nonetheless, an astonishing finding in
 experiment B3, C3 and D3 is that our model can keep up its accuracy above 90\%
 even when trainied on hits from 10\% of PDBs.  Lastly, sample size and triplet
-loss margin only have diminishing effects on improving model performance.  
+loss margin only have diminishing effects on improving model performance.  Fig.
+(\ref{fig : false single simulated}) is an overview of \textit{all} failed
+\textit{single-hit} cases in experiment A2.
+
 
 \begin{table}
     \caption{Experiments that demonstrate the model performances in various
     conditions.}
-    \label{tb : performance}
+    \label{tb : simulated performance}
     \begin{tabularx}{\linewidth}{ l | X X X X X }
         Experiment  &
         PDB$_{\text{train}}$ (\%) &
@@ -321,6 +344,106 @@ loss margin only have diminishing effects on improving model performance.
 \begin{figure}
 \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]
 {figures/false_label.single.simulated.pdf}
-\caption{Falsely labeled \textit{single-hit} in our test simulated dataset.}
+
+\caption{A partial collection of falsely labeled \textit{single-hit} in our test
+simulated dataset.  Query images are put into red boxes, whereas the
+corresponding `most similar' supported images chosen by our model are enclosed
+in green boxes.  The negative intensities are artificially reset to zero for
+cleaner visual purposes.  }
+
 \label{fig : false single simulated}
 \end{figure}
+
+
+\subsubsection{Revisit consistency of model performance on experimental dataset,
+but with simulation}
+
+%%                single-hit   multi-hit    accuracy   precision      recall specificity          f1
+%% single-hit            477           5        0.99        0.99        1.00        0.99        0.99
+%%  multi-hit              1         517        0.99        1.00        0.99        1.00        0.99
+
+We've seen great performance of our model on an experimental dataset comprising
+about 600 manually labeled SPI images.  More specifically, our model reached a
+99\% precision in predicting \textit{single-hit} by training on only 80
+\textit{single-hit}, 80 \textit{multi-hit} and 44 \textit{non-sample-hit}.
+However, can our model perform consistently on a larger size dataset while using
+the same number of training examples?  Complicated by the scarcity of labeled
+experimental datasets, we once again turn to simulating 2,000
+\textit{single-hit}, 500 \textit{double-hit}, 300 \textit{triplet-hit} and 200
+\textit{quadruple-hit} on an artifical pnCCD detector with \textit{skopi}.
+Similar to the simulated dataset used in the generalizability study, there's no
+\textit{non-sample-hit} class, but we consider everything other than
+\textit{single-hit} as \textit{multi-hit}.  
+
+We set aside 50\% of the simulated hits for training but only limit to 80 hits
+per class visible to our model.  The rest of the dataset are equally divided by
+the validation set and the test set.  Data preprocessing was applied in the same
+manner, which includes applying Possion noise and Gaussian noise, ROI cropping,
+random in-plane rotation and downsampling.  In Table \ref{tb : simulated
+performance large}, the confusion matrix directly illuminates that the model
+delivers an execellent classification performance on a larger size dataset.
+Therefore, we can optimistically conclude that our model can have a consistently
+good performance whilst trained on a small size training set.  
+
+\begin{table}
+    \caption{
+
+        Confusion matrix for the experiment investigating model performance on
+        a larger size dataset.
+
+    }
+
+    \label{tb : simulated performance large}
+
+        \begin{tabularx}{\linewidth}{ l | X X X X X X X }
+                                  &   S(A) & M(A) & ACC  & PRE  & REC           & SPE  & F1   \\
+            \hline
+            S(P)                  &   477  &  5   & 0.99 & 0.99 & 1.00          & 0.99 & 0.99 \\
+            M(P)                  &   1    & 517  & 0.99 & 1.00 & 0.99 & 1.00 & 0.99 \\
+        \end{tabularx}
+    %% }
+\end{table}
+
+
+%% Table \ref{tb: SPI
+%% experiments} is a list of all SPI experiments documented on CXIDB.  
+%% \begin{table}
+%%     \caption{All SPI experiments documented on CXIDB.}
+%%     \label{tb: SPI experiments}
+%%     %% \renewcommand{\arraystretch}{1.2}
+%%     %% \resizebox{1.0\textwidth}{!}{
+%%         \begin{tabularx}{\textwidth}{ l l X }
+%%             CXIDB ID & Light Source & Sample \\
+%%             \hline
+%%             1        & LCLS         & Mimivirus                                                       \\
+%%             2        & LCLS         & Mimivirus                                                       \\
+%%             3        & FLASH        & FIB etched 20-nm-thick silicon nitride membrane                 \\
+%%             4-8      & ALS          & Gold labeled frozen dried Saccharomyces cerevisiae yeast cells  \\
+%%             9        & FLASH        & Iron Oxide Ellipsoids                                           \\
+%%             10       & LCLS         & Nanorice                                                        \\
+%%             11       & LCLS         & Magnetosomes                                                    \\
+%%             12       & LCLS         & Tobacco mosaic virus                                            \\
+%%             13       & LCLS         & T4 bacteriophage                                                \\
+%%             14       & LCLS         & Paramecium bursaria Chlorella virus                             \\
+%%             19       & LCLS         & Airborne Particulate Matter (Soot)                              \\
+%%             20       & LCLS         & Clusters of Polystyrene Spheres                                 \\
+%%             25       & LCLS         & Carboxysomes                                                    \\
+%%             26       & LCLS         & Cyanobium gracile                                               \\
+%%             27       & LCLS         & Synechococcus elongatus                                         \\
+%%             28       & ALS          & 50 nm colloidal gold particles                                  \\
+%%             30       & LCLS         & Mimivirus                                                       \\
+%%             36       & LCLS         & Rice Dwarf Virus                                                \\
+%%             37       & LCLS         & Cyanobium gracile and Synechococcus elongtatus                  \\
+%%             56       & LCLS         & Omono River Virus                                               \\
+%%             57       & LCLS         & Gold core and palladium shell nanoparticles                     \\
+%%             58       & LCLS         & Coliphage PR772                                                 \\
+%%             78       & LCLS         & RNA polymerase II                                               \\
+%%             84       & ESRF         & Gold structure (largest diameter about 1.1 um)                  \\
+%%             88       & LCLS         & PR772                                                           \\
+%%             119      & LCLS         & Sucrose                                                         \\
+%%             146      & FLASH        & Xenon nanoclusters                                              \\
+%%             155      & LCLS         & Melbournevirus                                                  \\
+%%             156      & LCLS         & Coliphage PR772                                                 \\
+%%         \end{tabularx}
+%%     %% }
+%% \end{table}
