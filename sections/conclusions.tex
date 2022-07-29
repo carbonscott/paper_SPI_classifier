@@ -16,16 +16,27 @@
 
 
 
-
+\newcommand{\RN}[1]{%
+  \textup{\uppercase\expandafter{\romannumeral#1}}%
+}
 
 \section{Conclusions}
 
-We studied the performance of triplet neural networks on identifying hits in SPI
-experiments.  Firstly, we presented strong feasibility of applying our model to
-real-time SPI hit classification, which can be trained on a small size dataset
-within 15 minutes on a moderate GPU like NVIDIA 1080 Ti.  Secondly, we also
-demonstrated decent generalizability of our model in predict \textit{single-hit}
-s simulated from various PDBs.  This finding offers opportunities for building a
-universal hit classifier when more experimental data are collected from
-distinctive biological samples.
+We studied the performance of triplet neural networks on identifying \textit{hit}
+s in SPI experiments.  Firstly, we presented strong feasibility of applying our
+model to real-time SPI \textit{hit} classification, which can be trained on a
+small size dataset under 15 minutes on a moderate GPU like NVIDIA 1080 Ti.
+Secondly, we also demonstrated decent generalizability of our model in
+predicting \textit{single-hit}s simulated from various PDBs.  This finding
+offers opportunities for building a universal \textit{hit} classifier that can
+identify \textit{hit}s from distinctive biological samples.  
 
+One major challenge of using our classifier in a real-time application is to
+keep up with a potentially much higher detector readout rate.  Our model can
+perform classification at a rate of nearly $450 \text{Hz}$ on a NVIDIA 1080 Ti,
+which still falls far short to the $1 \text{MHz}$ detector readout rate in
+facilities like LCLS-\RN{2} by three orders of magnitude.  Therefore, we propose
+to incorporate \textit{hit}-filtering by intensity thresholding as the first
+step, which can quickly eliminate the vast majority of ``missed-target'' shots.
+Then, we follow up the \textit{hit} classification with our neural network based
+classifier.  

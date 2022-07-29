@@ -1,11 +1,12 @@
 \section{Related work}
 
-\subsection{Classifying SPI hits}
+\subsection{Classifying SPI \textit{hit}s}
 
-The task of SPI hits classification has been explored for over a decade. Prior
-to the first CXIDB data deposition \cite{seibertSingleMimivirusParticles2011}
-was available to the public, hit classification were performed by evaluating a
-cross-correlation of two SPI images in polar coordinates
+The task of SPI \textit{hit} classification has been explored for over a decade.
+Prior to the first CXIDB data deposition
+\cite{seibertSingleMimivirusParticles2011} was available to the public,
+\textit{hit} classification were performed by evaluating a cross-correlation of
+two SPI images in polar coordinates
 \cite{bortelClassificationAveragingRandom2009}.  An alternative classification
 approach was based on expectation maximization (EM)
 \cite{dempsterMaximumLikelihoodIncomplete1977}, which was later integrated in
@@ -15,19 +16,20 @@ size filtering, feature vectors and PCA was used for achieving a better
 \textit{single-hit} classification
 \cite{bobkovSortingAlgorithmsSingleparticle2015}.  More recently, artificial
 neural network models have become a new avenue for exploring classification
-solutions with the advent of capable infrastructures (GPUs, ML frameworks) for
-model training.  For instance, \cite{shiEvaluationPerformanceClassification2019}
-uses a CNN model  and \cite{ignatenkoClassificationDiffractionPatterns2021}
-employs off-the-shell YOLO models \cite{redmonYOLO9000BetterFaster2016,
+solutions with the advent of capable infrastructures (GPUs, machine learning
+frameworks) for model training.  For instance,
+\cite{shiEvaluationPerformanceClassification2019} uses a CNN model  and
+\cite{ignatenkoClassificationDiffractionPatterns2021} employs off-the-shell YOLO
+(You only look once) models \cite{redmonYOLO9000BetterFaster2016,
 redmonYOLOv3IncrementalImprovement2018}.  Both models were trained to
-performance binary classification for identifying \textit{single-hit}.  However,
-they all used a fully connected layer (FC) as the classifier that is directly
-attached to their vision modules (CNN).  This design has been known for its
+performance binary classification for identifying \textit{single-hit}s.  However,
+they all used a fully connected layer as the classifier that is directly
+attached to a CNN vision module.  This design has been known for its
 inefficiency in model training as pointed out in
 \cite{schroffFaceNetUnifiedEmbedding2015}.  Notably, the YOLO model in
 \cite{ignatenkoClassificationDiffractionPatterns2021} takes more than three
-hours to train before it achieves an accuracy of 95\% in predicting single hits.
-The training time is not clear in
+hours to train before it achieves an accuracy of 95\% in predicting
+\textit{single-hit}s.  The training time is not clear in
 \cite{shiEvaluationPerformanceClassification2019}, but its accuracy is 83.8\%.
 In contrast, our model demonstrates high accuracy on experimental data while
 keeping the training time short.  
@@ -35,10 +37,10 @@ keeping the training time short.
 
 \subsection{Generalizing a classifier}
 
-To our knowledge, there are no solution proposed to generalize a SPI hit
+To our knowledge, there are no solution proposed to generalize a SPI \textit{hit}
 classifier.  However, many approaches have been developed to generalize object
-recognition in computer vision.  One of the early example is signature
-verification using a siamese neural network
+recognition in computer vision.  One of the early examples was signature
+verification using siamese neural networks
 \cite{bromleySignatureVerificationUsing1994}.  The model basically measures the
 distance between two signature embeddings generated from two identical neural
 networks, which learn to seperate embeddings of different signatures in a latent
@@ -46,19 +48,20 @@ space and vice versa.  The idea of siamese networks were later applied in face
 recognition/verification \cite{chopraLearningSimilarityMetric2005}.  In the last
 decade, another breakthrough in face recognition was demonstrated by the use of
 triplet loss in \cite{kochSiameseNeuralNetworks2015a}, where both a positive
-image and a negative image are constrated against the same anchor image.
-Beyound signature or face verification, few-shot learning problems also require
+image and a negative image are constrated against the same anchor image.  Beyond
+signature or face verification, few-shot learning problems also require
 generalizing an existing classifier to identifying new categories of things not
 seen by the model before.  For example, \cite{vinyalsMatchingNetworksOne2017}
-introduced ``matching networks" that learn to query an unlabeleed image against
+introduced ``matching networks" that learn to query an unlabeled image against
 images in a small support set that have new labels.
 \cite{snellPrototypicalNetworksFewshot2017} proposed a prototypical network that
 learns a metric space where classification is effecetively done by measuring
-distances between an unlabelled image and the prototype representation, such as
+distances between an unlabeled image and the prototype representation, such as
 the average, of each new class.  In our application, we choose to use triplet
-loss method to train a SPI hit classifier.  In contrast to the thresholding in
-FaceNet which requires tuning an additional hyperparameter, our model treats an
-input image as a query item, which is then subject to similarity tests against
-embeddings from each hit class.  This approach is also easy to implement because
-the number of hit classes is three as opposed to faces of much more new
+loss method to train a SPI \textit{hit} classifier.  In contrast to the
+thresholding method in FaceNet which requires tuning an additional
+hyperparameter, our model treats an input image as a query item, which is then
+subject to some similarity tests against embeddings from each \textit{hit}
+class.  This approach is also easy to implement because the number of
+\textit{hit} classes is three as opposed to human faces of much more unique
 identities in face verification problem.  

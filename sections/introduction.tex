@@ -44,92 +44,100 @@ and only one sample particle, the emerging scattering pattern is defined as a
 \textit{single-hit}. Expectedly, a \textit{multi-hit} happens when X-ray pulses
 and a cluster of sample particles intersect. In some cases, X-ray pulses might
 hit non-biological objects in delivery medium and those resulting scattering
-patterns are labeled as \textit{non-sample-hit}.  Among the four categories,
-only \textit{single-hit} images will contribute to reconstruction of electron
-density maps through downstream data processing, e.g. orientation recovery and
-phase retrieval.  Therefore, the main goal of a SPI hit classifier is to
-identify \textit{single-hit}.  
+patterns are labeled as \textit{non-sample-hit}s.  Among the four categories,
+only \textit{single-hit}s will contribute to reconstruction of electron density
+maps through downstream data processing, e.g. orientation recovery and phase
+retrieval.  Therefore, the main goal of a SPI hit classifier is to identify
+\textit{single-hit}s.  For simplicity, we will use the word \textit{hit} to
+represent an image of SPI scattering pattern of any class throughout the rest of the paper.  
 
 
 % Past works
 
-Some pioneering works that address the challenge of classifying SPI hits have
+Some pioneering works addressing the challenge of classifying \textit{hit}s have
 been developed.  Unsupervised methods
 \cite{yoonUnsupervisedClassificationSingleparticle2011,
 giannakisSymmetriesImageFormation2012,schwanderSymmetriesImageFormation2012,
 yoonNovelAlgorithmsCoherent2012,
 andreassonAutomatedIdentificationClassification2014,
-bobkovSortingAlgorithmsSingleparticle2015} focus on extracting features from
-image samples and finding clusters of \textit{single-hit} images.  However,
+bobkovSortingAlgorithmsSingleparticle2015} focus on extracting image features
+from \textit{hit} samples and finding clusters of \textit{single-hit}s.  However,
 unsupervised solutions are highly problem-specific, that is to say, it's not
-realistic to expect \textit{single-hit} images from different biological samples
-would cluster in the feature space.  Moreover, despite being unsupervised, those
+realistic to expect \textit{single-hit}s from different biological samples would
+cluster in the feature space.  Moreover, despite being unsupervised, those
 solutions also require prior knowledge of data distribution in feature space for
-classification, rendering it incapable of being automated. On the other hand,
+classification, rendering it incapable of being automated.  On the other hand,
 supervised solutions based on artificial neural network models
 \cite{shiEvaluationPerformanceClassification2019,
-ignatenkoClassificationDiffractionPatterns2021} have been employed to learn from
-labelled images and provide predicted classification.  In these neural network
-models, convolutional neural networks (CNN) were applied for feature extraction
-and a fully connected layer is directly attached to the convolutional layers for
-classification.  Training both the CNN feature extraction module and the
-classifier simultaneously can be very inefficient and become a bottleneck in
-real-time classification.  Furthermore, all previous solutions, unsupervised or
-supervised, require human in the loop for labeling before they can be applied to
-classification.  It would be great if we can train a model that can be
-generalized to recognize hits obtained from various biological samples.  To our
-knowledge, there's currently no such hit classifier whose generalizability has
-even been demonstrated on simulated hits.  
+ignatenkoClassificationDiffractionPatterns2021} have been employed to recognize
+\textit{hit} classes through learning from labeled \textit{hit}s.  In these
+neural network models, convolutional neural networks (CNN) were applied for
+feature extraction and a fully connected (FC) layer is directly attached to the
+convolutional layers for classification.  Training both the CNN vision core and
+the classifier made of FC layers simultaneously can be very inefficient and
+become a bottleneck in real-time classification.  Furthermore, all previous
+solutions, unsupervised or supervised, require human in the loop for labeling
+before they can be applied to classification.  It would be great if we can train
+a model that can be generalized to recognize \textit{hit}s obtained from various
+biological samples.  To our knowledge, there's currently no such \textit{hit}
+classifier demonstrated even on simulated \textit{hit}s.  
 
 
 % (3) What are the core challenges?  In this work, we do this.  Concretely, our
 % contributions are ... 
 
-In this work, we strive to tackle the problem of real-time SPI hit
+In this work, we strive to tackle the problem of real-time SPI \textit{hit}
 classification by training an artificial neural network model that directly
-learns the embedding of hit images.  Depending on whether the solution requires
-human in the loop, there are two possible directions to approach this goal: (1)
-Use an experiment-specific model but trained efficiently in real time; (2) Train
-a generalized model that identifies hits from entirely different biological
-samples.  In the first scenario, the primary challenge is the design of a nerual
-network model that allows efficient training.  In the second scenario, we face a
-more practical challenge: there is no existing experimental or simulated dataset
-that contains hits from a large (hundreds or thousands) variety of biological
-samples.
+learns the embedding of \textit{hit}s.  Depending on whether the solution
+requires human in the loop, there are two possible directions to approach this
+goal: (1) Use an experiment-specific model but trained efficiently in real time;
+(2) Train a generalized model that identifies \textit{hit}s from entirely
+different biological samples.  In the first scenario, the primary challenge is
+the design of a nerual network model that allows efficient training.  In the
+second scenario, we face a more practical challenge: there is no existing
+experimental or simulated dataset that contains \textit{hit}s from a large
+(hundreds or thousands) variety of biological samples.
 
-Embedding method has been actively studied in the domain of machine learning,
-especially for computer vision or natural language processing applications.  One
-successful example is FaceNet \cite{schroffFaceNetUnifiedEmbedding2015} that is
-a generalized face embedding model with a deep convolutional neural network (CNN)
-trained on 100-200 million images.  FaceNet uses a contrastive learning approach
-to distinguish one class from another.  Fundementally, the model doesn't try to
+We approach the \textit{hit} classification problem with one of the embedding
+learning techniques, which have been actively studied in the domain of machine
+learning, especially for computer vision or natural language processing
+applications.  One successful example is FaceNet
+\cite{schroffFaceNetUnifiedEmbedding2015} that is a generalized face embedding
+model with a deep convolutional neural network (CNN) trained on 100-200 million
+images of human faces.  FaceNet uses a contrastive learning approach to
+distinguish one class from another.  Fundementally, the model doesn't try to
 learn human-engineered notions of a \textit{single-hit}, but it learns to
 understand that \textit{single-hit} is different from \textit{multi-hit} or
-\textit{non-sample-hit}.  Our insight is that it is much easier to draw contrast
-between two things than to learn the notion of an individual class.  Similar to
-the FaceNet model, our neural network model learns hit embeddings directly by
-drawing constrasts from many triplets of hits.  A triplet consists of an anchor
-image, a positive image that shares the same label as the anchor, and a negative
-image that has a different label.  We train our model using the triplet loss
-function proposed in the FaceNet.  
+\textit{non-sample-hit}.  We share the same insight that it should be much
+easier to draw contrast between two things than to learn the notion of an
+individual class.  Similar to the FaceNet model, our neural network model learns
+\textit{hit} embeddings directly by drawing constrasts from many triplets of
+\textit{hit}s.  A triplet consists of an anchor image, a positive image that
+shares the same label as the anchor, and a negative image that has a different
+label.  We train our model using the triplet loss function proposed in the
+FaceNet.  
 
 Concretely, our contributions are summarized below.  
 
 \begin{itemize}
 
     \item We introduce a neural network model that classifies SPI
-    \textit{single-hit} with a 99\% accuracy but only takes under 15 minutes to
-    train on a NVIDIA 1080Ti.  The model learns from 80 uniquely labeled hits
-    per class and there are three classes in consideration: \textit{single-hit},
-    \textit{multi-hit} and \textit{non-sample-hit}.  Thanks to the low demand on
-    the number of training examples and short training time, our model is
-    sufficient to take on real-time hit classification tasks.  
+    \textit{single-hit}s with a 99\% accuracy but only takes under 15 minutes to
+    train on a NVIDIA 1080Ti, on which the inference speed can reach an
+    approximate frequency of $450 \text{Hz}$.  The model learns from 80 uniquely
+    labeled \textit{hit}s per class and there are three classes in consideration:
+    \textit{single-hit}, \textit{multi-hit} and \textit{non-sample-hit}.
+    Moreover, the model can still yield an accuracy above 90\% at the cost of
+    labeling 40 unique \textit{hit}s per class.  Thanks to the low demand on the
+    number of training examples and short training time, our model is sufficient
+    to take on real-time \textit{hit} classification tasks at least at the $450
+    \text{Hz}$ realm.  
 
     \item We highlight a promising result that our neural network model can be
-    generalize to recognize \textit{simulated} SPI hits from different
+    generalized to recognize \textit{simulated} SPI \textit{hit}s from different
     biological samples with a 86\% test accuracy.  The practical implication of
-    this result is currently limited due to the shortage of experimental
-    datasets, but our model is a step closer to realizing a generalized hit
-    classification model.
+    this result is currently limited due to the shortage of labeled experimental
+    datasets, but our model is a step closer to realizing a generalized
+    \textit{hit} classification model.  
 
 \end{itemize}
